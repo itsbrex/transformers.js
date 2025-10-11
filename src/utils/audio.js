@@ -131,7 +131,7 @@ const HERTZ_TO_MEL_MAPPING = {
 /**
  * @template {Float32Array|Float64Array|number} T
  * @param {T} freq
- * @param {string} [mel_scale]
+ * @param {keyof typeof HERTZ_TO_MEL_MAPPING} [mel_scale]
  * @returns {T}
  */
 function hertz_to_mel(freq, mel_scale = 'htk') {
@@ -154,7 +154,7 @@ const MEL_TO_HERTZ_MAPPING = {
 /**
  * @template {Float32Array|Float64Array|number} T
  * @param {T} mels
- * @param {string} [mel_scale]
+ * @param {keyof typeof MEL_TO_HERTZ_MAPPING} [mel_scale]
  * @returns {T}
  */
 function mel_to_hertz(mels, mel_scale = 'htk') {
@@ -235,8 +235,8 @@ function linspace(start, end, num) {
  * @param {number} min_frequency Lowest frequency of interest in Hz.
  * @param {number} max_frequency Highest frequency of interest in Hz. This should not exceed `sampling_rate / 2`.
  * @param {number} sampling_rate Sample rate of the audio waveform.
- * @param {string} [norm] If `"slaney"`, divide the triangular mel weights by the width of the mel band (area normalization).
- * @param {string} [mel_scale] The mel frequency scale to use, `"htk"` or `"slaney"`.
+ * @param {string|null} [norm] If `"slaney"`, divide the triangular mel weights by the width of the mel band (area normalization).
+ * @param {keyof typeof MEL_TO_HERTZ_MAPPING} [mel_scale] The mel frequency scale to use, `"htk"` or `"slaney"`.
  * @param {boolean} [triangularize_in_mel_space] If this option is enabled, the triangular filter is applied in mel space rather than frequency space.
  * This should be set to `true` in order to get the same results as `torchaudio` when computing mel filters.
  * @returns {number[][]} Triangular filter bank matrix, which is a 2D array of shape (`num_frequency_bins`, `num_mel_filters`).

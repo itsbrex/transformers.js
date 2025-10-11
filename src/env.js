@@ -150,9 +150,9 @@ const localModelPath = RUNNING_LOCALLY ? path.join(dirname__, DEFAULT_LOCAL_MODE
  * @property {boolean} useFS Whether to use the file system to load files. By default, it is `true` if available.
  * @property {boolean} useBrowserCache Whether to use Cache API to cache models. By default, it is `true` if available.
  * @property {boolean} useFSCache Whether to use the file system to cache files. By default, it is `true` if available.
- * @property {string} cacheDir The directory to use for caching files with the file system. By default, it is `./.cache`.
+ * @property {string|null} cacheDir The directory to use for caching files with the file system. By default, it is `./.cache`.
  * @property {boolean} useCustomCache Whether to use a custom cache system (defined by `customCache`), defaults to `false`.
- * @property {Object} customCache The custom cache to use. Defaults to `null`. Note: this must be an object which
+ * @property {Object|null} customCache The custom cache to use. Defaults to `null`. Note: this must be an object which
  * implements the `match` and `put` functions of the Web Cache API. For more information, see https://developer.mozilla.org/en-US/docs/Web/API/Cache.
  * If you wish, you may also return a `Promise<string>` from the `match` function if you'd like to use a file path instead of `Promise<Response>`.
  */

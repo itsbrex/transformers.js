@@ -1,5 +1,6 @@
 export * from './audio_spectrogram_transformer/feature_extraction_audio_spectrogram_transformer.js';
 export * from './encodec/feature_extraction_encodec.js';
+export * from './chatterbox/feature_extraction_chatterbox.js';
 export * from './clap/feature_extraction_clap.js';
 export * from './dac/feature_extraction_dac.js';
 export * from './gemma3n/feature_extraction_gemma3n.js';

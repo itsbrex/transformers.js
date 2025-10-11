@@ -72,6 +72,7 @@ function getNormalizedConfig(config) {
         case 'voxtral':
         case 'smolvlm':
         case 'gemma3n':
+        case 'chatterbox':
             // @ts-expect-error TS2339
             init_normalized_config = getNormalizedConfig(config.text_config);
             break;

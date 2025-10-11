@@ -158,8 +158,8 @@ export function pop(obj, key, defaultValue = undefined) {
 /**
  * Efficiently merge arrays, creating a new copy.
  * Adapted from https://stackoverflow.com/a/6768642/13989043
- * @param  {Array[]} arrs Arrays to merge.
- * @returns {Array} The merged array.
+ * @param  {any[]} arrs Arrays to merge.
+ * @returns {any[]} The merged array.
  */
 export function mergeArrays(...arrs) {
     return Array.prototype.concat.apply([], arrs);
@@ -167,8 +167,8 @@ export function mergeArrays(...arrs) {
 
 /**
  * Compute the Cartesian product of given arrays
- * @param {...Array} a Arrays to compute the product
- * @returns {Array} Returns the computed Cartesian product as an array
+ * @param {...any[]} a Arrays to compute the product
+ * @returns {any[]} Returns the computed Cartesian product as an array
  * @private
  */
 export function product(...a) {

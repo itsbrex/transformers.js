@@ -120,6 +120,7 @@ const MODEL_TYPES = {
     AudioTextToText: 10,
     AutoEncoder: 11,
     ImageAudioTextToText: 12,
+    Chatterbox: 13,
 };
 //////////////////////////////////////////////////
 
@@ -1004,6 +1005,31 @@ function multimodality_prepare_inputs_for_generation(self, input_ids, model_inpu
     return model_inputs;
 }
 
+function chatterbox_prepare_inputs_for_generation(self, input_ids, model_inputs, generation_config) {
+    // If position_ids are not provided, we create them on the fly using the position of the START_SPEECH_TOKEN
+    if (!model_inputs.position_ids) {
+        const START_SPEECH_TOKEN = 6561;
+        if (model_inputs.input_ids.dims[1] === 1) {
+            const position_ids = Array.from({
+                length: input_ids.length,
+            }, (_, i) => input_ids[i].length - input_ids[i].findLastIndex(x => x == START_SPEECH_TOKEN) - 1);
+            model_inputs.position_ids = new Tensor('int64', position_ids, [input_ids.length, 1]);
+        } else {
+            const batched_input_ids = model_inputs.input_ids.tolist();
+            const position_ids_list = batched_input_ids.map(ids => {
+                let position = 0;
+                return ids.map(id => (id >= START_SPEECH_TOKEN) ? 0 : position++);
+            });
+            model_inputs.position_ids = new Tensor('int64', position_ids_list.flat(), model_inputs.input_ids.dims);
+        }
+    }
+    if (model_inputs.input_ids.dims[1] === 1) {
+        // We are in generation mode and no longer need the audio inputs
+        model_inputs.audio_values = null;
+    }
+    return decoder_prepare_inputs_for_generation(self, input_ids, model_inputs, generation_config);
+}
+
 //////////////////////////////////////////////////
 
 //////////////////////////////////////////////////
@@ -1013,6 +1039,8 @@ function multimodality_prepare_inputs_for_generation(self, input_ids, model_inpu
 export class PreTrainedModel extends Callable {
     main_input_name = 'input_ids';
     forward_params = ['input_ids', 'attention_mask'];
+
+    _return_dict_in_generate_keys = null;
     /**
      * Creates a new instance of the `PreTrainedModel` class.
      * @param {import('./configs.js').PretrainedConfig} config The model configuration.
@@ -1073,6 +1101,9 @@ export class PreTrainedModel extends Callable {
             case MODEL_TYPES.AutoEncoder:
                 this._forward = autoEncoderForward;
                 break;
+            case MODEL_TYPES.Chatterbox:
+                this.can_generate = true;
+                this._prepare_inputs_for_generation = chatterbox_prepare_inputs_for_generation;
             default:
                 // should be MODEL_TYPES.EncoderOnly
                 this._forward = encoderForward;
@@ -1325,6 +1356,18 @@ export class PreTrainedModel extends Callable {
                     },
                     options,
                 ),
+            ]);
+        } else if (modelType === MODEL_TYPES.Chatterbox) {
+            info = await Promise.all([
+                constructSessions(pretrained_model_name_or_path, {
+                    embed_tokens: 'embed_tokens',
+                    speech_encoder: 'speech_encoder',
+                    model: 'language_model',
+                    conditional_decoder: 'conditional_decoder',
+                }, options, 'model'),
+                getOptionalConfigs(pretrained_model_name_or_path, {
+                    generation_config: 'generation_config.json',
+                }, options),
             ]);
         } else if (modelType === MODEL_TYPES.AutoEncoder) {
             info = await Promise.all([
@@ -1960,19 +2003,24 @@ export class PreTrainedModel extends Callable {
         ////////////////////////////////////////////////////
         let outputs;
         let attentions = {};
+        let return_dict_items = {};
         while (true) {
             // prepare model inputs
             model_inputs = this.prepare_inputs_for_generation(all_input_ids, model_inputs, generation_config);
             outputs = await this.forward(model_inputs);
 
-            if (generation_config.output_attentions && generation_config.return_dict_in_generate) {
-                // Get attentions if they are present
-                const token_attentions = this.getAttentions(outputs);
-                for (const key in token_attentions) {
-                    if (!(key in attentions)) {
-                        attentions[key] = [];
+            if (generation_config.return_dict_in_generate) {
+                if (generation_config.output_attentions) {
+                    // Get attentions if they are present
+                    const token_attentions = this.getAttentions(outputs);
+                    for (const key in token_attentions) {
+                        if (!(key in attentions)) {
+                            attentions[key] = [];
+                        }
+                        attentions[key].push(token_attentions[key]);
                     }
-                    attentions[key].push(token_attentions[key]);
+                } else if (this._return_dict_in_generate_keys) {
+                    Object.assign(return_dict_items, pick(outputs, this._return_dict_in_generate_keys));
                 }
             }
 
@@ -2036,6 +2084,7 @@ export class PreTrainedModel extends Callable {
                 sequences,
                 past_key_values,
                 ...attentions,
+                ...return_dict_items,
                 // TODO:
                 // scores,
                 // logits,
@@ -7158,7 +7207,7 @@ export class MusicgenForConditionalGeneration extends PreTrainedModel {
 
         // apply the pattern mask to the final ids
         // tensor: int64[1,batch_size,4,chunk_length]
-        const audio_codes = this._apply_and_filter_by_delay_pattern_mask(/** @type {Tensor} */ (output_ids)).unsqueeze_(
+        const audio_codes = this._apply_and_filter_by_delay_pattern_mask(/** @type {Tensor} */(output_ids)).unsqueeze_(
             0,
         ); // append the frame dimension back to the audio codes
 
@@ -7463,7 +7512,7 @@ export class UltravoxModel extends UltravoxPreTrainedModel {
 }
 //////////////////////////////////////////////////
 
-export class VoxtralForConditionalGeneration extends UltravoxModel {}
+export class VoxtralForConditionalGeneration extends UltravoxModel { }
 
 //////////////////////////////////////////////////
 // Mimi models
@@ -7667,6 +7716,105 @@ export class SnacDecoderModel extends SnacPreTrainedModel {
     }
 }
 //////////////////////////////////////////////////
+
+export class ChatterboxPreTrainedModel extends PreTrainedModel {
+    forward_params = [
+        'input_ids',
+        'inputs_embeds',
+        'attention_mask',
+        'position_ids',
+        'audio_values',
+        'exaggeration',
+        'past_key_values',
+    ];
+    main_input_name = 'input_ids';
+
+    _return_dict_in_generate_keys = [
+        'audio_tokens',
+        'speaker_embeddings',
+        'speaker_features'
+    ]
+}
+export class ChatterboxModel extends ChatterboxPreTrainedModel {
+
+    async forward({
+        // Produced by the tokenizer/processor:
+        input_ids = null,
+        attention_mask = null,
+        audio_values = null,
+        exaggeration = null,
+
+        // Used during generation:
+        position_ids = null,
+        inputs_embeds = null,
+        past_key_values = null,
+
+        // Generic generation parameters
+        generation_config = null,
+        logits_processor = null,
+
+        // TODO: needed?
+        ...kwargs
+    }) {
+        let speech_encoder_outputs;
+        if (!inputs_embeds) {
+            ({ inputs_embeds } = await sessionRun(this.sessions['embed_tokens'], {
+                input_ids,
+                position_ids,
+                exaggeration,
+            }));
+            if (audio_values) {
+                speech_encoder_outputs = await sessionRun(this.sessions['speech_encoder'], {
+                    audio_values,
+                });
+
+                // Update LLM inputs
+                inputs_embeds = cat([speech_encoder_outputs.audio_features, inputs_embeds], 1);
+                attention_mask = ones([inputs_embeds.dims[0], inputs_embeds.dims[1]]);
+            } else {
+                const target_length = inputs_embeds.dims[1];
+                if (!past_key_values || target_length !== 1) {
+                    throw new Error('Incorrect state encountered during generation.');
+                }
+                const past_length = Object.values(past_key_values)[0].dims.at(-2);
+                attention_mask = ones([inputs_embeds.dims[0], past_length + target_length]);
+            }
+        }
+
+        const outputs = await decoderForward(this, {
+            inputs_embeds,
+            past_key_values,
+            attention_mask,
+            generation_config,
+            logits_processor,
+        }, false);
+        return {
+            ...outputs,
+            ...speech_encoder_outputs,
+        };
+    }
+
+    /** @type {PreTrainedModel['generate']} */
+    async generate(params) {
+        const { sequences, audio_tokens, speaker_embeddings, speaker_features } = /** @type {any} */ (await super.generate({
+            ...params,
+            return_dict_in_generate: true,
+        }));
+
+        const new_tokens = sequences.slice(null, [
+            params.input_ids.dims[1],  // Exclude start of speech token
+            -1,                        // Exclude end of speech token
+        ]);
+
+        const speech_tokens = cat([audio_tokens, new_tokens], 1);
+        const { waveform } = await sessionRun(this.sessions['conditional_decoder'], {
+            speech_tokens,
+            speaker_features,
+            speaker_embeddings,
+        });
+        return waveform;
+    }
+}
 
 //////////////////////////////////////////////////
 // AutoModels, used to simplify construction of PreTrainedModels
@@ -8289,6 +8437,7 @@ const CUSTOM_MAPPING = [
     ['SnacDecoderModel', SnacDecoderModel, MODEL_TYPES.EncoderOnly],
 
     ['Gemma3nForConditionalGeneration', Gemma3nForConditionalGeneration, MODEL_TYPES.ImageAudioTextToText],
+    ['ChatterboxModel', ChatterboxModel, MODEL_TYPES.Chatterbox],
 ];
 for (const [name, model, type] of CUSTOM_MAPPING) {
     MODEL_TYPE_MAPPING.set(name, type);
