@@ -118,7 +118,7 @@ export class Tensor {
     /**
      * Returns an iterator object for iterating over the tensor data in row-major order.
      * If the tensor has more than one dimension, the iterator will yield subarrays.
-     * @returns {Iterator} An iterator object for iterating over the tensor data in row-major order.
+     * @returns {Iterator<any>} An iterator object for iterating over the tensor data in row-major order.
      */
     *[Symbol.iterator]() {
         const [iterLength, ...iterDims] = this.dims;
@@ -197,7 +197,7 @@ export class Tensor {
 
     /**
      * Convert tensor data to a n-dimensional JS list
-     * @returns {Array}
+     * @returns {any[]}
      */
     tolist() {
         return reshape(this.data, this.dims);
@@ -474,6 +474,7 @@ export class Tensor {
     }
 
     // TODO: implement transpose. For now (backwards compatibility), it's just an alias for permute()
+    /** @type {Tensor['permute']} */
     transpose(...dims) {
         return this.permute(...dims);
     }
@@ -481,7 +482,7 @@ export class Tensor {
     /**
      * Returns the sum of each row of the input tensor in the given dimension dim.
      *
-     * @param {number} [dim=null] The dimension or dimensions to reduce. If `null`, all dimensions are reduced.
+     * @param {number|null} [dim=null] The dimension or dimensions to reduce. If `null`, all dimensions are reduced.
      * @param {boolean} keepdim Whether the output tensor has `dim` retained or not.
      * @returns The summed tensor
      */
@@ -492,7 +493,7 @@ export class Tensor {
     /**
      * Returns the matrix norm or vector norm of a given tensor.
      * @param {number|string} [p='fro'] The order of norm
-     * @param {number} [dim=null] Specifies which dimension of the tensor to calculate the norm across.
+     * @param {number|null} [dim=null] Specifies which dimension of the tensor to calculate the norm across.
      * If dim is None, the norm will be calculated across all dimensions of input.
      * @param {boolean} [keepdim=false] Whether the output tensors have dim retained or not.
      * @returns {Tensor} The norm of the tensor.
@@ -506,7 +507,7 @@ export class Tensor {
         }
 
         const this_data = this.data;
-        const fn = (a, b) => a + b ** p;
+        const fn = (/** @type {number} */ a, /** @type {number} */ b) => a + b ** p;
 
         if (dim === null) {
             // @ts-ignore
@@ -583,7 +584,7 @@ export class Tensor {
      * NOTE: The returned tensor shares the storage with the input tensor, so changing the contents of one will change the contents of the other.
      * If you would like a copy, use `tensor.clone()` before squeezing.
      *
-     * @param {number|number[]} [dim=null] If given, the input will be squeezed only in the specified dimensions.
+     * @param {number|number[]|null} [dim=null] If given, the input will be squeezed only in the specified dimensions.
      * @returns {Tensor} The squeezed tensor
      */
     squeeze(dim = null) {
@@ -606,14 +607,15 @@ export class Tensor {
      * @param {number} dim The index at which to insert the singleton dimension
      * @returns {Tensor} The unsqueezed tensor
      */
-    unsqueeze(dim = null) {
+    unsqueeze(dim) {
         return new Tensor(this.type, this.data, calc_unsqueeze_dims(this.dims, dim));
     }
 
     /**
      * In-place version of @see {@link Tensor.unsqueeze}
+     * @type {Tensor['unsqueeze']}
      */
-    unsqueeze_(dim = null) {
+    unsqueeze_(dim) {
         this.dims = calc_unsqueeze_dims(this.dims, dim);
         return this;
     }
@@ -715,6 +717,7 @@ export class Tensor {
 
     /**
      * In-place version of @see {@link Tensor.clamp}
+     * @type {Tensor['clamp']}
      */
     clamp_(min, max) {
         const this_data = this.data;
@@ -898,7 +901,7 @@ function reshape(data, dimensions) {
 /**
  * Permutes a tensor according to the provided axes.
  * @param {any} tensor The input tensor to permute.
- * @param {Array} axes The axes to permute the tensor along.
+ * @param {number[]} axes The axes to permute the tensor along.
  * @returns {Tensor} The permuted tensor.
  */
 export function permute(tensor, axes) {
@@ -1169,7 +1172,7 @@ function calc_unsqueeze_dims(dims, dim) {
  * Safely calculate the index for an array of a given size, allowing negative indexing.
  * @param {number} index The index that will be used.
  * @param {number} size The size of the array.
- * @param {number} [dimension=null] The dimension that the index is for (optional).
+ * @param {number|null} [dimension=null] The dimension that the index is for (optional).
  * @returns {number} The index, guaranteed to be non-negative and less than `arrayLength`.
  *
  * @throws {Error} If the index is out of range.
@@ -1273,11 +1276,12 @@ export function stack(tensors, dim = 0) {
 /**
  * @param {(previousValue: any, currentValue: any, currentIndex?: number, resultIndex?: number) => any} callbackfn
  * @param {Tensor} input the input tensor.
- * @param {number|null} dim the dimension to reduce.
+ * @param {number} dim the dimension to reduce.
  * @param {boolean} keepdim whether the output tensor has dim retained or not.
+ * @param {any} [initialValue=null] the initial value to start the reduction with.
  * @returns {[DataType, any, number[]]} The reduced tensor data.
  */
-function reduce_helper(callbackfn, input, dim = null, keepdim = false, initialValue = null) {
+function reduce_helper(callbackfn, input, dim, keepdim = false, initialValue = null) {
     const inputData = input.data;
     const inputDims = input.dims;
 
