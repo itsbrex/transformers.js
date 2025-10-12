@@ -33,5 +33,5 @@
  */
 
 /**
- * @typedef {GenerationFunctionParametersBase & import('./configuration_utils.js').GenerationConfig & Record<string, any>} GenerationFunctionParameters
+ * @typedef {GenerationFunctionParametersBase & Partial<import('./configuration_utils.js').GenerationConfig> & Record<string, any>} GenerationFunctionParameters
  */
