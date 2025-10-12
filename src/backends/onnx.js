@@ -132,13 +132,14 @@ export function deviceToExecutionProviders(device = null) {
     throw new Error(`Unsupported device: "${device}". Should be one of: ${supportedDevices.join(', ')}.`);
 }
 
+const IS_WEB_ENV = apis.IS_BROWSER_ENV || apis.IS_WEBWORKER_ENV;
+
 /**
- * To prevent multiple calls to `initWasm()`, we store the first call in a Promise
- * that is resolved when the first InferenceSession is created. Subsequent calls
- * will wait for this Promise to resolve before creating their own InferenceSession.
- * @type {Promise<any>|null}
+ * Currently, Transformers.js doesn't support simultaneous loading of sessions in WASM/WebGPU.
+ * For this reason, we need to chain the loading calls.
+ * @type {Promise<any>}
  */
-let wasmInitPromise = null;
+let webInitChain = Promise.resolve();
 
 /**
  * Create an ONNX inference session.
@@ -148,15 +149,11 @@ let wasmInitPromise = null;
  * @returns {Promise<import('onnxruntime-common').InferenceSession & { config: Object}>} The ONNX inference session.
  */
 export async function createInferenceSession(buffer_or_path, session_options, session_config) {
-    if (wasmInitPromise) {
-        // A previous session has already initialized the WASM runtime
-        // so we wait for it to resolve before creating this new session.
-        await wasmInitPromise;
-    }
-
-    const sessionPromise = InferenceSession.create(buffer_or_path, session_options);
-    wasmInitPromise ??= sessionPromise;
-    const session = await sessionPromise;
+    const load = () => InferenceSession.create(buffer_or_path, session_options);
+    const session = await (IS_WEB_ENV
+        ? (webInitChain = webInitChain.then(load))
+        : load()
+    );
     session.config = session_config;
     return session;
 }
@@ -168,8 +165,6 @@ export async function createInferenceSession(buffer_or_path, session_options, se
  * @type {Promise<any>}
  */
 let webInferenceChain = Promise.resolve();
-
-const IS_WEB_ENV = apis.IS_BROWSER_ENV || apis.IS_WEBWORKER_ENV;
 
 /**
  * Run an inference session.
