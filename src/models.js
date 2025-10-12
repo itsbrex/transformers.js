@@ -1025,7 +1025,11 @@ function chatterbox_prepare_inputs_for_generation(self, input_ids, model_inputs,
     }
     if (model_inputs.input_ids.dims[1] === 1) {
         // We are in generation mode and no longer need the audio inputs
-        model_inputs.audio_values = null;
+        delete model_inputs.audio_values;
+        delete model_inputs.audio_features;
+        delete model_inputs.audio_tokens;
+        delete model_inputs.speaker_embeddings;
+        delete model_inputs.speaker_features;
     }
     return decoder_prepare_inputs_for_generation(self, input_ids, model_inputs, generation_config);
 }
@@ -7725,6 +7729,10 @@ export class ChatterboxPreTrainedModel extends PreTrainedModel {
         'position_ids',
         'audio_values',
         'exaggeration',
+        'audio_features',
+        'audio_tokens',
+        'speaker_embeddings',
+        'speaker_features',
         'past_key_values',
     ];
     main_input_name = 'input_ids';
@@ -7736,6 +7744,16 @@ export class ChatterboxPreTrainedModel extends PreTrainedModel {
     ]
 }
 export class ChatterboxModel extends ChatterboxPreTrainedModel {
+
+    /**
+     * @param {Tensor} audio_values
+     * @returns {Promise<{audio_features: Tensor, audio_tokens: Tensor, speaker_embeddings: Tensor, speaker_features: Tensor}>}
+     */
+    async encode_speech(audio_values) {
+        return sessionRun(this.sessions['speech_encoder'], {
+            audio_values,
+        });
+    }
 
     async forward({
         // Produced by the tokenizer/processor:
@@ -7753,20 +7771,48 @@ export class ChatterboxModel extends ChatterboxPreTrainedModel {
         generation_config = null,
         logits_processor = null,
 
+        // Speaker embeddings/features (useful for re-using pre-computed speaker data)
+        audio_features = null,      // float32[batch_size,sequence_length,1024]
+        audio_tokens = null,        // int64[batch_size,audio_sequence_length]
+        speaker_embeddings = null,  // float32[batch_size,192]
+        speaker_features = null,    // float32[batch_size,feature_dim,80]
+
         // TODO: needed?
         ...kwargs
     }) {
         let speech_encoder_outputs;
         if (!inputs_embeds) {
+            // Support the following types for exaggeration:
+            // 1. null/undefined (no exaggeration): use the default of 0.5
+            // 2. number: broadcast to (batch_size,)
+            // 3. number[]: convert to Tensor of shape (batch_size,)
+            // 4. Tensor of shape (batch_size, 1)
+            if (!(exaggeration instanceof Tensor)) {
+                const batch_size = input_ids.dims[0];
+                if (exaggeration == null) {
+                    exaggeration = full([batch_size], 0.5);
+                } else if (typeof exaggeration === 'number') {
+                    exaggeration = full([batch_size], exaggeration);
+                } else if (Array.isArray(exaggeration)) {
+                    exaggeration = new Tensor('float32', exaggeration, [batch_size]);
+                } else {
+                    throw new Error('Unsupported type for `exaggeration` input');
+                }
+            }
+
             ({ inputs_embeds } = await sessionRun(this.sessions['embed_tokens'], {
                 input_ids,
                 position_ids,
                 exaggeration,
             }));
-            if (audio_values) {
-                speech_encoder_outputs = await sessionRun(this.sessions['speech_encoder'], {
-                    audio_values,
-                });
+
+            if (audio_features && audio_tokens && speaker_embeddings && speaker_features) {
+                // Use pre-computed speech encoder outputs
+                speech_encoder_outputs = { audio_features, audio_tokens, speaker_embeddings, speaker_features };
+            }
+
+            if (speech_encoder_outputs || audio_values) {
+                speech_encoder_outputs ??= await this.encode_speech(audio_values);
 
                 // Update LLM inputs
                 inputs_embeds = cat([speech_encoder_outputs.audio_features, inputs_embeds], 1);
