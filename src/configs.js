@@ -110,6 +110,7 @@ function getNormalizedConfig(config) {
             break;
         case 'llama':
         case 'llama4_text':
+        case 'nanochat':
         case 'arcee':
         case 'lfm2':
         case 'smollm3':
@@ -117,6 +118,7 @@ function getNormalizedConfig(config) {
         case 'olmo2':
         case 'mobilellm':
         case 'granite':
+        case 'granitemoehybrid':
         case 'cohere':
         case 'mistral':
         case 'starcoder2':

@@ -1709,7 +1709,8 @@ export class AutomaticSpeechRecognitionPipeline
             case 'unispeech':
             case 'unispeech-sat':
             case 'hubert':
-                return this._call_wav2vec2(audio, kwargs);
+            case 'parakeet_ctc':
+                return this._call_wav2vec2(audio, kwargs)
             case 'moonshine':
                 return this._call_moonshine(audio, kwargs);
             default:
@@ -1751,8 +1752,8 @@ export class AutomaticSpeechRecognitionPipeline
             for (const item of logits) {
                 predicted_ids.push(max(item.data)[1]);
             }
-            const predicted_sentences = this.tokenizer.decode(predicted_ids);
-            toReturn.push({ text: predicted_sentences });
+            const predicted_sentences = this.tokenizer.decode(predicted_ids, { skip_special_tokens: true }).trim();
+            toReturn.push({ text: predicted_sentences })
         }
         return single ? toReturn[0] : toReturn;
     }

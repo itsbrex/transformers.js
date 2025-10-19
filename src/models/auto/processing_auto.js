@@ -7,6 +7,10 @@ import * as AllImageProcessors from '../image_processors.js';
 import * as AllFeatureExtractors from '../feature_extractors.js';
 
 /**
+ * @typedef {import('../../base/processing_utils.js').PretrainedProcessorOptions} PretrainedProcessorOptions
+ */
+
+/**
  * Helper class which is used to instantiate pretrained processors with the `from_pretrained` function.
  * The chosen processor class is determined by the type specified in the processor config.
  *

@@ -73,8 +73,6 @@ import {
     MinLengthLogitsProcessor,
     MinNewTokensLengthLogitsProcessor,
     TemperatureLogitsWarper,
-    TopKLogitsWarper,
-    TopPLogitsWarper,
     ClassifierFreeGuidanceLogitsProcessor,
 } from './generation/logits_process.js';
 
@@ -1438,32 +1436,7 @@ export class PreTrainedModel extends Callable {
     }
 
     /**
-     * This function returns a [`LogitsProcessorList`] list object that contains all relevant [`LogitsWarper`]
-     * instances used for multinomial sampling.
-     * @param {GenerationConfig} generation_config The generation config.
-     * @returns {LogitsProcessorList} generation_config
-     */
-    _get_logits_warper(generation_config) {
-        // instantiate warpers list
-        const warpers = new LogitsProcessorList();
-
-        if (generation_config.temperature !== null && generation_config.temperature !== 1.0) {
-            warpers.push(new TemperatureLogitsWarper(generation_config.temperature));
-        }
-        if (generation_config.top_k !== null && generation_config.top_k !== 0) {
-            // TODO: add min_tokens_to_keep
-            warpers.push(new TopKLogitsWarper(generation_config.top_k));
-        }
-        if (generation_config.top_p !== null && generation_config.top_p < 1.0) {
-            // TODO: add min_tokens_to_keep
-            warpers.push(new TopPLogitsWarper(generation_config.top_p));
-        }
-
-        return warpers;
-    }
-
-    /**
-     * @param {GenerationConfig} generation_config
+     * @param {GenerationConfig} generation_config 
      * @param {number} input_ids_seq_length The starting sequence length for the input ids.
      * @returns {LogitsProcessorList}
      * @private
@@ -1591,6 +1564,25 @@ export class PreTrainedModel extends Callable {
         // 8. prepare batched CFG externally
         if (generation_config.guidance_scale !== null && generation_config.guidance_scale > 1) {
             processors.push(new ClassifierFreeGuidanceLogitsProcessor(generation_config.guidance_scale));
+        }
+
+
+        if (generation_config.temperature === 0 && generation_config.do_sample) {
+          console.warn('`do_sample` changed to false because `temperature: 0` implies greedy sampling (always selecting the most likely token), which is incompatible with `do_sample: true`.');
+          generation_config.do_sample = false;
+        }
+
+        if (generation_config.do_sample) {
+            if (generation_config.temperature !== null && generation_config.temperature !== 1.0) {
+                processors.push(new TemperatureLogitsWarper(generation_config.temperature));
+            }
+            // TODO: Add TopPLogitsWarper and TopKLogitsWarper
+            // if (generation_config.top_k !== null && generation_config.top_k !== 0) {
+            //     processors.push(new TopKLogitsWarper(generation_config.top_k));
+            // }
+            // if (generation_config.top_p !== null && generation_config.top_p < 1.0) {
+            //     processors.push(new TopPLogitsWarper(generation_config.top_p));
+            // }
         }
 
         if (logits_processor !== null) {
@@ -4737,6 +4729,12 @@ export class Llama4PreTrainedModel extends PreTrainedModel { }
 export class Llama4ForCausalLM extends Llama4PreTrainedModel { }
 //////////////////////////////////////////////////
 
+//////////////////////////////////////////////////
+// NanoChat models
+export class NanoChatPreTrainedModel extends PreTrainedModel { }
+export class NanoChatModel extends NanoChatPreTrainedModel { }
+export class NanoChatForCausalLM extends NanoChatPreTrainedModel { }
+//////////////////////////////////////////////////
 
 //////////////////////////////////////////////////
 // Arcee models
@@ -4806,6 +4804,13 @@ export class Olmo2ForCausalLM extends Olmo2PreTrainedModel {}
 export class GranitePreTrainedModel extends PreTrainedModel {}
 export class GraniteModel extends GranitePreTrainedModel {}
 export class GraniteForCausalLM extends GranitePreTrainedModel {}
+//////////////////////////////////////////////////
+
+//////////////////////////////////////////////////
+// GraniteMoeHybrid models
+export class GraniteMoeHybridPreTrainedModel extends PreTrainedModel { }
+export class GraniteMoeHybridModel extends GraniteMoeHybridPreTrainedModel { }
+export class GraniteMoeHybridForCausalLM extends GraniteMoeHybridPreTrainedModel { }
 //////////////////////////////////////////////////
 
 //////////////////////////////////////////////////
@@ -6255,6 +6260,22 @@ export class Wav2Vec2ForAudioFrameClassification extends Wav2Vec2PreTrainedModel
     }
 }
 //////////////////////////////////////////////////
+
+//////////////////////////////////////////////////
+// Parakeet models
+export class ParakeetPreTrainedModel extends PreTrainedModel { };
+export class ParakeetForCTC extends ParakeetPreTrainedModel {
+    /**
+     * @param {Object} model_inputs
+     * @param {Tensor} model_inputs.input_values Float values of input raw speech waveform.
+     * @param {Tensor} model_inputs.attention_mask Mask to avoid performing convolution and attention on padding token indices. Mask values selected in [0, 1]
+     */
+    async _call(model_inputs) {
+        return new CausalLMOutput(await super._call(model_inputs));
+    }
+}
+//////////////////////////////////////////////////
+
 
 //////////////////////////////////////////////////
 // PyAnnote models
@@ -8063,6 +8084,7 @@ const MODEL_MAPPING_NAMES_DECODER_ONLY = new Map([
     ['gpt_neox', ['GPTNeoXModel', GPTNeoXModel]],
     ['codegen', ['CodeGenModel', CodeGenModel]],
     ['llama', ['LlamaModel', LlamaModel]],
+    ['nanochat', ['NanoChatModel', NanoChatModel]],
     ['arcee', ['ArceeModel', ArceeModel]],
     ['lfm2', ['Lfm2Model', Lfm2Model]],
     ['smollm3', ['SmolLM3Model', SmolLM3Model]],
@@ -8071,6 +8093,7 @@ const MODEL_MAPPING_NAMES_DECODER_ONLY = new Map([
     ['olmo2', ['Olmo2Model', Olmo2Model]],
     ['mobilellm', ['MobileLLMModel', MobileLLMModel]],
     ['granite', ['GraniteModel', GraniteModel]],
+    ['granitemoehybrid', ['GraniteMoeHybridModel', GraniteMoeHybridModel]],
     ['cohere', ['CohereModel', CohereModel]],
     ['gemma', ['GemmaModel', GemmaModel]],
     ['gemma2', ['Gemma2Model', Gemma2Model]],
@@ -8172,6 +8195,7 @@ const MODEL_FOR_CAUSAL_LM_MAPPING_NAMES = new Map([
     ['gpt_neox', ['GPTNeoXForCausalLM', GPTNeoXForCausalLM]],
     ['codegen', ['CodeGenForCausalLM', CodeGenForCausalLM]],
     ['llama', ['LlamaForCausalLM', LlamaForCausalLM]],
+    ['nanochat', ['NanoChatForCausalLM', NanoChatForCausalLM]],
     ['llama4_text', ['Llama4ForCausalLM', Llama4ForCausalLM]],
     ['arcee', ['ArceeForCausalLM', ArceeForCausalLM]],
     ['lfm2', ['Lfm2ForCausalLM', Lfm2ForCausalLM]],
@@ -8181,6 +8205,7 @@ const MODEL_FOR_CAUSAL_LM_MAPPING_NAMES = new Map([
     ['olmo2', ['Olmo2ForCausalLM', Olmo2ForCausalLM]],
     ['mobilellm', ['MobileLLMForCausalLM', MobileLLMForCausalLM]],
     ['granite', ['GraniteForCausalLM', GraniteForCausalLM]],
+    ['granitemoehybrid', ['GraniteMoeHybridForCausalLM', GraniteMoeHybridForCausalLM]],
     ['cohere', ['CohereForCausalLM', CohereForCausalLM]],
     ['gemma', ['GemmaForCausalLM', GemmaForCausalLM]],
     ['gemma2', ['Gemma2ForCausalLM', Gemma2ForCausalLM]],
@@ -8352,6 +8377,7 @@ const MODEL_FOR_CTC_MAPPING_NAMES = new Map([
     ['unispeech-sat', ['UniSpeechSatForCTC', UniSpeechSatForCTC]],
     ['wavlm', ['WavLMForCTC', WavLMForCTC]],
     ['hubert', ['HubertForCTC', HubertForCTC]],
+    ['parakeet_ctc', ['ParakeetForCTC', ParakeetForCTC]],
 ]);
 
 const MODEL_FOR_AUDIO_CLASSIFICATION_MAPPING_NAMES = new Map([
