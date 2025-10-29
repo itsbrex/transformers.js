@@ -1,4 +1,3 @@
-
 export * from './beit/image_processing_beit.js';
 export * from './bit/image_processing_bit.js';
 export * from './chinese_clip/image_processing_chinese_clip.js';

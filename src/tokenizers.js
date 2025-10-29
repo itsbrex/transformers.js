@@ -231,7 +231,7 @@ function fuse_unk(arr, tokens_to_ids, unk_token_id) {
         }
 
         while (++i < arr.length && (tokens_to_ids.get(arr[i]) ?? unk_token_id) === unk_token_id) {
-            if (tokens_to_ids.get(/** @type {string} */(fused.at(-1))) !== unk_token_id) {
+            if (tokens_to_ids.get(/** @type {string} */ (fused.at(-1))) !== unk_token_id) {
                 fused[fused.length - 1] += arr[i];
             }
         }
@@ -258,11 +258,11 @@ const PROBLEMATIC_REGEX_MAP = new Map([
     // These use the case insensitive group modifier, which is not supported in JavaScript.
     // When parsing the regex, an "Invalid group" error is thrown.
     ["(?i:'s|'t|'re|'ve|'m|'ll|'d)", "(?:'([sS]|[tT]|[rR][eE]|[vV][eE]|[mM]|[lL][lL]|[dD]))"],
-    ["(?i:[sdmt]|ll|ve|re)", "(?:[sS]|[dD]|[mM]|[tT]|[lL][lL]|[vV][eE]|[rR][eE])"],
+    ['(?i:[sdmt]|ll|ve|re)', '(?:[sS]|[dD]|[mM]|[tT]|[lL][lL]|[vV][eE]|[rR][eE])'],
 
     // JS doesn't support possessive quantifiers (these are used in recent OpenAI tokenizers).
-    ["[^\\r\\n\\p{L}\\p{N}]?+", "[^\\r\\n\\p{L}\\p{N}]?"],
-    ["[^\\s\\p{L}\\p{N}]++", "[^\\s\\p{L}\\p{N}]+"],
+    ['[^\\r\\n\\p{L}\\p{N}]?+', '[^\\r\\n\\p{L}\\p{N}]?'],
+    ['[^\\s\\p{L}\\p{N}]++', '[^\\s\\p{L}\\p{N}]+'],
 
     // Used to override the default (invalid) regex of the bloom pretokenizer.
     // For more information, see https://github.com/huggingface/transformers.js/issues/94
@@ -1722,15 +1722,15 @@ class TemplateProcessing extends PostProcessor {
      * @typedef {Object} SpecialToken
      * @property {string} id The id of the special token.
      * @property {number} type_id The type id of the special token.
-     * 
+     *
      * @typedef {Object} Sequence
      * @property {"A"|"B"} id The id of the sequence ('A' or 'B').
      * @property {number} type_id The type id of the sequence.
-     * 
+     *
      * @typedef {Object} TemplateItem
      * @property {SpecialToken} [SpecialToken] A special token to be added.
      * @property {Sequence} [Sequence] A sequence of tokens to be added.
-     * 
+     *
      * @typedef {Record<string, {id: string, ids: number[], tokens: string[]}>} SpecialTokensMap
      */
 

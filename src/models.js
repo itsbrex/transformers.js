@@ -1008,15 +1008,18 @@ function chatterbox_prepare_inputs_for_generation(self, input_ids, model_inputs,
     if (!model_inputs.position_ids) {
         const START_SPEECH_TOKEN = 6561;
         if (model_inputs.input_ids.dims[1] === 1) {
-            const position_ids = Array.from({
-                length: input_ids.length,
-            }, (_, i) => input_ids[i].length - input_ids[i].findLastIndex(x => x == START_SPEECH_TOKEN) - 1);
+            const position_ids = Array.from(
+                {
+                    length: input_ids.length,
+                },
+                (_, i) => input_ids[i].length - input_ids[i].findLastIndex((x) => x == START_SPEECH_TOKEN) - 1,
+            );
             model_inputs.position_ids = new Tensor('int64', position_ids, [input_ids.length, 1]);
         } else {
             const batched_input_ids = model_inputs.input_ids.tolist();
-            const position_ids_list = batched_input_ids.map(ids => {
+            const position_ids_list = batched_input_ids.map((ids) => {
                 let position = 0;
-                return ids.map(id => (id >= START_SPEECH_TOKEN) ? 0 : position++);
+                return ids.map((id) => (id >= START_SPEECH_TOKEN ? 0 : position++));
             });
             model_inputs.position_ids = new Tensor('int64', position_ids_list.flat(), model_inputs.input_ids.dims);
         }
@@ -1361,15 +1364,24 @@ export class PreTrainedModel extends Callable {
             ]);
         } else if (modelType === MODEL_TYPES.Chatterbox) {
             info = await Promise.all([
-                constructSessions(pretrained_model_name_or_path, {
-                    embed_tokens: 'embed_tokens',
-                    speech_encoder: 'speech_encoder',
-                    model: 'language_model',
-                    conditional_decoder: 'conditional_decoder',
-                }, options, 'model'),
-                getOptionalConfigs(pretrained_model_name_or_path, {
-                    generation_config: 'generation_config.json',
-                }, options),
+                constructSessions(
+                    pretrained_model_name_or_path,
+                    {
+                        embed_tokens: 'embed_tokens',
+                        speech_encoder: 'speech_encoder',
+                        model: 'language_model',
+                        conditional_decoder: 'conditional_decoder',
+                    },
+                    options,
+                    'model',
+                ),
+                getOptionalConfigs(
+                    pretrained_model_name_or_path,
+                    {
+                        generation_config: 'generation_config.json',
+                    },
+                    options,
+                ),
             ]);
         } else if (modelType === MODEL_TYPES.AutoEncoder) {
             info = await Promise.all([
@@ -1436,7 +1448,7 @@ export class PreTrainedModel extends Callable {
     }
 
     /**
-     * @param {GenerationConfig} generation_config 
+     * @param {GenerationConfig} generation_config
      * @param {number} input_ids_seq_length The starting sequence length for the input ids.
      * @returns {LogitsProcessorList}
      * @private
@@ -1566,10 +1578,11 @@ export class PreTrainedModel extends Callable {
             processors.push(new ClassifierFreeGuidanceLogitsProcessor(generation_config.guidance_scale));
         }
 
-
         if (generation_config.temperature === 0 && generation_config.do_sample) {
-          console.warn('`do_sample` changed to false because `temperature: 0` implies greedy sampling (always selecting the most likely token), which is incompatible with `do_sample: true`.');
-          generation_config.do_sample = false;
+            console.warn(
+                '`do_sample` changed to false because `temperature: 0` implies greedy sampling (always selecting the most likely token), which is incompatible with `do_sample: true`.',
+            );
+            generation_config.do_sample = false;
         }
 
         if (generation_config.do_sample) {
@@ -4723,17 +4736,16 @@ export class LlamaModel extends LlamaPreTrainedModel {}
 export class LlamaForCausalLM extends LlamaPreTrainedModel {}
 //////////////////////////////////////////////////
 
-
 //////////////////////////////////////////////////
-export class Llama4PreTrainedModel extends PreTrainedModel { }
-export class Llama4ForCausalLM extends Llama4PreTrainedModel { }
+export class Llama4PreTrainedModel extends PreTrainedModel {}
+export class Llama4ForCausalLM extends Llama4PreTrainedModel {}
 //////////////////////////////////////////////////
 
 //////////////////////////////////////////////////
 // NanoChat models
-export class NanoChatPreTrainedModel extends PreTrainedModel { }
-export class NanoChatModel extends NanoChatPreTrainedModel { }
-export class NanoChatForCausalLM extends NanoChatPreTrainedModel { }
+export class NanoChatPreTrainedModel extends PreTrainedModel {}
+export class NanoChatModel extends NanoChatPreTrainedModel {}
+export class NanoChatForCausalLM extends NanoChatPreTrainedModel {}
 //////////////////////////////////////////////////
 
 //////////////////////////////////////////////////
@@ -4808,9 +4820,9 @@ export class GraniteForCausalLM extends GranitePreTrainedModel {}
 
 //////////////////////////////////////////////////
 // GraniteMoeHybrid models
-export class GraniteMoeHybridPreTrainedModel extends PreTrainedModel { }
-export class GraniteMoeHybridModel extends GraniteMoeHybridPreTrainedModel { }
-export class GraniteMoeHybridForCausalLM extends GraniteMoeHybridPreTrainedModel { }
+export class GraniteMoeHybridPreTrainedModel extends PreTrainedModel {}
+export class GraniteMoeHybridModel extends GraniteMoeHybridPreTrainedModel {}
+export class GraniteMoeHybridForCausalLM extends GraniteMoeHybridPreTrainedModel {}
 //////////////////////////////////////////////////
 
 //////////////////////////////////////////////////
@@ -4857,9 +4869,9 @@ export class Gemma2ForCausalLM extends Gemma2PreTrainedModel {}
 
 //////////////////////////////////////////////////
 // VaultGemma models
-export class VaultGemmaPreTrainedModel extends PreTrainedModel { }
-export class VaultGemmaModel extends VaultGemmaPreTrainedModel { }
-export class VaultGemmaForCausalLM extends VaultGemmaPreTrainedModel { }
+export class VaultGemmaPreTrainedModel extends PreTrainedModel {}
+export class VaultGemmaModel extends VaultGemmaPreTrainedModel {}
+export class VaultGemmaForCausalLM extends VaultGemmaPreTrainedModel {}
 //////////////////////////////////////////////////
 
 //////////////////////////////////////////////////
@@ -5990,13 +6002,13 @@ export class Dinov2WithRegistersForImageClassification extends Dinov2WithRegiste
 //////////////////////////////////////////////////
 
 //////////////////////////////////////////////////
-export class DINOv3ViTPreTrainedModel extends PreTrainedModel { }
-export class DINOv3ViTModel extends DINOv3ViTPreTrainedModel { }
+export class DINOv3ViTPreTrainedModel extends PreTrainedModel {}
+export class DINOv3ViTModel extends DINOv3ViTPreTrainedModel {}
 //////////////////////////////////////////////////
 
 //////////////////////////////////////////////////
-export class DINOv3ConvNextPreTrainedModel extends PreTrainedModel { }
-export class DINOv3ConvNextModel extends DINOv3ConvNextPreTrainedModel { }
+export class DINOv3ConvNextPreTrainedModel extends PreTrainedModel {}
+export class DINOv3ConvNextModel extends DINOv3ConvNextPreTrainedModel {}
 //////////////////////////////////////////////////
 
 //////////////////////////////////////////////////
@@ -6263,7 +6275,7 @@ export class Wav2Vec2ForAudioFrameClassification extends Wav2Vec2PreTrainedModel
 
 //////////////////////////////////////////////////
 // Parakeet models
-export class ParakeetPreTrainedModel extends PreTrainedModel { };
+export class ParakeetPreTrainedModel extends PreTrainedModel {}
 export class ParakeetForCTC extends ParakeetPreTrainedModel {
     /**
      * @param {Object} model_inputs
@@ -6275,7 +6287,6 @@ export class ParakeetForCTC extends ParakeetPreTrainedModel {
     }
 }
 //////////////////////////////////////////////////
-
 
 //////////////////////////////////////////////////
 // PyAnnote models
@@ -7232,7 +7243,7 @@ export class MusicgenForConditionalGeneration extends PreTrainedModel {
 
         // apply the pattern mask to the final ids
         // tensor: int64[1,batch_size,4,chunk_length]
-        const audio_codes = this._apply_and_filter_by_delay_pattern_mask(/** @type {Tensor} */(output_ids)).unsqueeze_(
+        const audio_codes = this._apply_and_filter_by_delay_pattern_mask(/** @type {Tensor} */ (output_ids)).unsqueeze_(
             0,
         ); // append the frame dimension back to the audio codes
 
@@ -7537,7 +7548,7 @@ export class UltravoxModel extends UltravoxPreTrainedModel {
 }
 //////////////////////////////////////////////////
 
-export class VoxtralForConditionalGeneration extends UltravoxModel { }
+export class VoxtralForConditionalGeneration extends UltravoxModel {}
 
 //////////////////////////////////////////////////
 // Mimi models
@@ -7758,14 +7769,9 @@ export class ChatterboxPreTrainedModel extends PreTrainedModel {
     ];
     main_input_name = 'input_ids';
 
-    _return_dict_in_generate_keys = [
-        'audio_tokens',
-        'speaker_embeddings',
-        'speaker_features'
-    ]
+    _return_dict_in_generate_keys = ['audio_tokens', 'speaker_embeddings', 'speaker_features'];
 }
 export class ChatterboxModel extends ChatterboxPreTrainedModel {
-
     /**
      * @param {Tensor} audio_values
      * @returns {Promise<{audio_features: Tensor, audio_tokens: Tensor, speaker_embeddings: Tensor, speaker_features: Tensor}>}
@@ -7793,10 +7799,10 @@ export class ChatterboxModel extends ChatterboxPreTrainedModel {
         logits_processor = null,
 
         // Speaker embeddings/features (useful for re-using pre-computed speaker data)
-        audio_features = null,      // float32[batch_size,sequence_length,1024]
-        audio_tokens = null,        // int64[batch_size,audio_sequence_length]
-        speaker_embeddings = null,  // float32[batch_size,192]
-        speaker_features = null,    // float32[batch_size,feature_dim,80]
+        audio_features = null, // float32[batch_size,sequence_length,1024]
+        audio_tokens = null, // int64[batch_size,audio_sequence_length]
+        speaker_embeddings = null, // float32[batch_size,192]
+        speaker_features = null, // float32[batch_size,feature_dim,80]
 
         // TODO: needed?
         ...kwargs
@@ -7848,13 +7854,17 @@ export class ChatterboxModel extends ChatterboxPreTrainedModel {
             }
         }
 
-        const outputs = await decoderForward(this, {
-            inputs_embeds,
-            past_key_values,
-            attention_mask,
-            generation_config,
-            logits_processor,
-        }, false);
+        const outputs = await decoderForward(
+            this,
+            {
+                inputs_embeds,
+                past_key_values,
+                attention_mask,
+                generation_config,
+                logits_processor,
+            },
+            false,
+        );
         return {
             ...outputs,
             ...speech_encoder_outputs,
@@ -7863,14 +7873,16 @@ export class ChatterboxModel extends ChatterboxPreTrainedModel {
 
     /** @type {PreTrainedModel['generate']} */
     async generate(params) {
-        const { sequences, audio_tokens, speaker_embeddings, speaker_features } = /** @type {any} */ (await super.generate({
-            ...params,
-            return_dict_in_generate: true,
-        }));
+        const { sequences, audio_tokens, speaker_embeddings, speaker_features } = /** @type {any} */ (
+            await super.generate({
+                ...params,
+                return_dict_in_generate: true,
+            })
+        );
 
         const new_tokens = sequences.slice(null, [
-            params.input_ids.dims[1],  // Exclude start of speech token
-            -1,                        // Exclude end of speech token
+            params.input_ids.dims[1], // Exclude start of speech token
+            -1, // Exclude end of speech token
         ]);
 
         const speech_tokens = cat([audio_tokens, new_tokens], 1);

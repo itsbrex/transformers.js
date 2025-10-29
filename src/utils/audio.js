@@ -497,7 +497,7 @@ export async function spectrogram(
         do_pad = true,
         transpose = false,
         mel_offset = 0,
-    } = {}
+    } = {},
 ) {
     const window_length = window.length;
     if (fft_length === null) {

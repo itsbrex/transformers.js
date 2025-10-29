@@ -1,5 +1,5 @@
-import { createInferenceSession, runInferenceSession, isONNXProxy } from "../backends/onnx.js";
-import { Tensor } from "../utils/tensor.js";
+import { createInferenceSession, runInferenceSession, isONNXProxy } from '../backends/onnx.js';
+import { Tensor } from '../utils/tensor.js';
 
 /**
  * Asynchronously creates a wrapper function for running an ONNX inference session.
@@ -15,16 +15,20 @@ import { Tensor } from "../utils/tensor.js";
 const wrap = async (session_bytes, session_options, names) => {
     const session = await createInferenceSession(new Uint8Array(session_bytes), session_options);
 
-    return /** @type {any} */(async (/** @type {Record<string, Tensor>} */ inputs) => {
-        const proxied = isONNXProxy();
-        const ortFeed = Object.fromEntries(Object.entries(inputs).map(([k, v]) => [k, (proxied ? v.clone() : v).ort_tensor]));
-        const outputs = await runInferenceSession(session, ortFeed);
-        if (Array.isArray(names)) {
-            return names.map((n) => new Tensor(outputs[n]));
-        } else {
-            return new Tensor(outputs[/** @type {string} */(names)]);
+    return /** @type {any} */ (
+        async (/** @type {Record<string, Tensor>} */ inputs) => {
+            const proxied = isONNXProxy();
+            const ortFeed = Object.fromEntries(
+                Object.entries(inputs).map(([k, v]) => [k, (proxied ? v.clone() : v).ort_tensor]),
+            );
+            const outputs = await runInferenceSession(session, ortFeed);
+            if (Array.isArray(names)) {
+                return names.map((n) => new Tensor(outputs[n]));
+            } else {
+                return new Tensor(outputs[/** @type {string} */ (names)]);
+            }
         }
-    });
+    );
 };
 
 // In-memory registry of initialized ONNX operators
