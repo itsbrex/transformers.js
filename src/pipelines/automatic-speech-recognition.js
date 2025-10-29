@@ -1,4 +1,3 @@
-
 import { Pipeline, prepareAudios } from './_base.js';
 
 import { Tensor } from '../utils/tensor.js';
@@ -138,7 +137,7 @@ export class AutomaticSpeechRecognitionPipeline
             case 'unispeech-sat':
             case 'hubert':
             case 'parakeet_ctc':
-                return this._call_wav2vec2(audio, kwargs)
+                return this._call_wav2vec2(audio, kwargs);
             case 'moonshine':
                 return this._call_moonshine(audio, kwargs);
             default:
@@ -181,7 +180,7 @@ export class AutomaticSpeechRecognitionPipeline
                 predicted_ids.push(max(item.data)[1]);
             }
             const predicted_sentences = this.tokenizer.decode(predicted_ids, { skip_special_tokens: true }).trim();
-            toReturn.push({ text: predicted_sentences })
+            toReturn.push({ text: predicted_sentences });
         }
         return single ? toReturn[0] : toReturn;
     }

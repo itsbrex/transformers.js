@@ -1,5 +1,3 @@
-
-
 import { Pipeline, prepareImages } from './_base.js';
 import { RawImage } from '../utils/image.js';
 
@@ -18,7 +16,6 @@ import { interpolate_4d } from '../utils/tensor.js';
  *
  * @typedef {ImagePipelineConstructorArgs & ImageToImagePipelineCallback & Disposable} ImageToImagePipelineType
  */
-
 
 /**
  * @typedef {Object} DepthEstimationPipelineOutput

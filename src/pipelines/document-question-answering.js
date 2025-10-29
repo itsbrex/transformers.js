@@ -1,4 +1,3 @@
-
 import { Pipeline, prepareImages } from './_base.js';
 
 import { Tensor } from '../utils/tensor.js';

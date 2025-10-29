@@ -1,4 +1,3 @@
-
 import { Pipeline, prepareAudios } from './_base.js';
 
 import { softmax } from '../utils/maths.js';
@@ -9,7 +8,6 @@ import { softmax } from '../utils/maths.js';
  * @typedef {import('./_base.js').AudioPipelineInputs} AudioPipelineInputs
  * @typedef {import('./_base.js').AudioInput} AudioInput
  */
-
 
 /**
  * @typedef {Object} ZeroShotAudioClassificationOutput
@@ -33,7 +31,6 @@ import { softmax } from '../utils/maths.js';
  *
  * @typedef {TextAudioPipelineConstructorArgs & ZeroShotAudioClassificationPipelineCallback & Disposable} ZeroShotAudioClassificationPipelineType
  */
-
 
 /**
  * Zero shot audio classification pipeline using `ClapModel`. This pipeline predicts the class of an audio when you

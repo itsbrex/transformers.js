@@ -1,4 +1,3 @@
-
 import { Pipeline, prepareImages } from './_base.js';
 
 import { Tensor } from '../utils/tensor.js';
@@ -8,7 +7,6 @@ import { Tensor } from '../utils/tensor.js';
  * @typedef {import('./_base.js').Disposable} Disposable
  * @typedef {import('./_base.js').ImagePipelineInputs} ImagePipelineInputs
  */
-
 
 /**
  * @typedef {Object} ImageToTextSingle

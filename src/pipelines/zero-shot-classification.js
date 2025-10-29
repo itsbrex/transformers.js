@@ -1,4 +1,3 @@
-
 import { Pipeline } from './_base.js';
 
 import { softmax } from '../utils/maths.js';
@@ -31,7 +30,6 @@ import { softmax } from '../utils/maths.js';
  *
  * @typedef {TextPipelineConstructorArgs & ZeroShotClassificationPipelineCallback & Disposable} ZeroShotClassificationPipelineType
  */
-
 
 /**
  * NLI-based zero-shot classification pipeline using a `ModelForSequenceClassification`

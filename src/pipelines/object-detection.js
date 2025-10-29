@@ -7,8 +7,6 @@ import { Pipeline, prepareImages, get_bounding_box } from './_base.js';
  * @typedef {import('./_base.js').BoundingBox} BoundingBox
  */
 
-
-
 /**
  * @typedef {Object} ObjectDetectionPipelineSingle
  * @property {string} label The class label identified by the model.

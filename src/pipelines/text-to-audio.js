@@ -1,11 +1,9 @@
-
 import { Pipeline } from './_base.js';
 
 import { Tensor } from '../utils/tensor.js';
 import { RawAudio } from '../utils/audio.js';
 
 import { AutoModel } from '../models.js';
-
 
 /**
  * @typedef {import('./_base.js').TextAudioPipelineConstructorArgs} TextAudioPipelineConstructorArgs

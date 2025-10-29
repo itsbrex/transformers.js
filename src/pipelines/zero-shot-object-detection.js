@@ -1,4 +1,3 @@
-
 import { Pipeline, prepareImages, get_bounding_box } from './_base.js';
 
 /**
@@ -7,7 +6,6 @@ import { Pipeline, prepareImages, get_bounding_box } from './_base.js';
  * @typedef {import('./_base.js').ImagePipelineInputs} ImagePipelineInputs
  * @typedef {import('./_base.js').BoundingBox} BoundingBox
  */
-
 
 /**
  * @typedef {Object} ZeroShotObjectDetectionOutput

@@ -1,4 +1,3 @@
-
 import { PreTrainedTokenizer } from '../tokenizers.js';
 import { PreTrainedModel } from '../models.js';
 import { Processor } from '../base/processing_utils.js';

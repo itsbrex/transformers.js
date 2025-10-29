@@ -1,4 +1,3 @@
-
 import { Pipeline } from './_base.js';
 
 import { Tensor, topk } from '../utils/tensor.js';

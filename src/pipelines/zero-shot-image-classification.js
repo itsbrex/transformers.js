@@ -1,4 +1,3 @@
-
 import { Pipeline, prepareImages } from './_base.js';
 
 import { softmax } from '../utils/maths.js';
@@ -8,7 +7,6 @@ import { softmax } from '../utils/maths.js';
  * @typedef {import('./_base.js').Disposable} Disposable
  * @typedef {import('./_base.js').ImagePipelineInputs} ImagePipelineInputs
  */
-
 
 /**
  * @typedef {Object} ZeroShotImageClassificationOutput

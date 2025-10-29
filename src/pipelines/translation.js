@@ -1,12 +1,9 @@
-
-
 import { Text2TextGenerationPipeline } from './text2text-generation.js';
 
 /**
  * @typedef {import('./_base.js').TextPipelineConstructorArgs} TextPipelineConstructorArgs
  * @typedef {import('./_base.js').Disposable} Disposable
  */
-
 
 /**
  * @typedef {Object} TranslationSingle
@@ -20,7 +17,6 @@ import { Text2TextGenerationPipeline } from './text2text-generation.js';
  *
  * @typedef {TextPipelineConstructorArgs & TranslationPipelineCallback & Disposable} TranslationPipelineType
  */
-
 
 /**
  * Translates text from one language to another.

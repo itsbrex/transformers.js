@@ -41,9 +41,7 @@ import {
     AutoModelForImageFeatureExtraction,
 } from './models.js';
 
-
 import { dispatchCallback } from './utils/core.js';
-
 
 import { TextClassificationPipeline } from './pipelines/text-classification.js';
 import { TokenClassificationPipeline } from './pipelines/token-classification.js';
@@ -579,4 +577,4 @@ export {
     DepthEstimationPipeline,
     FeatureExtractionPipeline,
     ImageFeatureExtractionPipeline,
-}
+};

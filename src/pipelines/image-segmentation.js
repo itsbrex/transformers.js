@@ -1,4 +1,3 @@
-
 import { Pipeline } from './_base.js';
 import { prepareImages } from './_base.js';
 

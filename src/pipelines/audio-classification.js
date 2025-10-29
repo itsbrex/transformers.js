@@ -1,4 +1,3 @@
-
 import { Pipeline, prepareAudios } from './_base.js';
 
 import { Tensor, topk } from '../utils/tensor.js';
@@ -9,7 +8,6 @@ import { softmax } from '../utils/maths.js';
  * @typedef {import('./_base.js').Disposable} Disposable
  * @typedef {import('./_base.js').AudioPipelineInputs} AudioPipelineInputs
  */
-
 
 /**
  * @typedef {Object} AudioClassificationSingle

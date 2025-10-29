@@ -1,5 +1,3 @@
-
-
 import { Pipeline } from './_base.js';
 
 import { product } from '../utils/core.js';

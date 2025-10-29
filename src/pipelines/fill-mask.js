@@ -1,5 +1,3 @@
-
-
 import { Pipeline } from './_base.js';
 
 import { Tensor, topk } from '../utils/tensor.js';
@@ -9,7 +7,6 @@ import { softmax } from '../utils/maths.js';
  * @typedef {import('./_base.js').TextPipelineConstructorArgs} TextPipelineConstructorArgs
  * @typedef {import('./_base.js').Disposable} Disposable
  */
-
 
 /**
  * @typedef {Object} FillMaskSingle
@@ -32,7 +29,6 @@ import { softmax } from '../utils/maths.js';
  *
  * @typedef {TextPipelineConstructorArgs & FillMaskPipelineCallback & Disposable} FillMaskPipelineType
  */
-
 
 /**
  * Masked language modeling prediction pipeline using any `ModelWithLMHead`.
