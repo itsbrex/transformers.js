@@ -2122,7 +2122,11 @@ export class PreTrainedModel extends Callable {
         for (const name in decoderResults) {
             if (name.startsWith('present')) {
                 const newName = name
-                    .replace('present_conv', 'past_conv') // Hybrid cache architecture (e.g., LFM2)
+                    // Hybrid cache architecture
+                    .replace('present_ssm', 'past_ssm') // Mamba
+                    .replace('present_conv', 'past_conv') // LFM2
+
+                    // Standard cache architecture
                     .replace('present', 'past_key_values');
                 const is_encoder_pkv = name.includes('encoder');
                 if (is_encoder_pkv && pastKeyValues) {
