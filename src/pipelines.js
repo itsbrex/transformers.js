@@ -333,9 +333,7 @@ const SUPPORTED_TASKS = Object.freeze({
         model: AutoModelForDepthEstimation,
         processor: AutoProcessor,
         default: {
-            // TODO: replace with original
-            // "model": "Intel/dpt-large",
-            model: 'Xenova/dpt-large',
+            model: 'onnx-community/depth-anything-v2-small',
         },
         type: 'image',
     },
