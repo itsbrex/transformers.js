@@ -354,6 +354,7 @@ const SUPPORTED_TASKS = Object.freeze({
         model: [AutoModelForImageFeatureExtraction, AutoModel],
         default: {
             model: 'onnx-community/dinov3-vits16-pretrain-lvd1689m-ONNX',
+            dtype: 'fp32',
         },
         type: 'image',
     },
