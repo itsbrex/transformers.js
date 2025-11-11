@@ -343,9 +343,8 @@ const SUPPORTED_TASKS = Object.freeze({
         pipeline: FeatureExtractionPipeline,
         model: AutoModel,
         default: {
-            // TODO: replace with original
-            // "model": "sentence-transformers/all-MiniLM-L6-v2",
-            model: 'Xenova/all-MiniLM-L6-v2',
+            model: 'onnx-community/all-MiniLM-L6-v2-ONNX',
+            dtype: 'fp32',
         },
         type: 'text',
     },

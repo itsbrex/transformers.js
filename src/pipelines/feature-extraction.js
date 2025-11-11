@@ -26,47 +26,50 @@ import { Tensor, mean_pooling, quantize_embeddings } from '../utils/tensor.js';
  * Feature extraction pipeline using no model head. This pipeline extracts the hidden
  * states from the base transformer, which can be used as features in downstream tasks.
  *
- * **Example:** Run feature extraction with `bert-base-uncased` (without pooling/normalization).
+ * **Example:** Run feature extraction using `onnx-community/all-MiniLM-L6-v2-ONNX` (without pooling or normalization).
  * ```javascript
- * const extractor = await pipeline('feature-extraction', 'Xenova/bert-base-uncased', { revision: 'default' });
+ * import { pipeline } from '@huggingface/transformers';
+ *
+ * const extractor = await pipeline('feature-extraction', 'onnx-community/all-MiniLM-L6-v2-ONNX');
  * const output = await extractor('This is a simple test.');
  * // Tensor {
  * //   type: 'float32',
- * //   data: Float32Array [0.05939924716949463, 0.021655935794115067, ...],
- * //   dims: [1, 8, 768]
+ * //   data: Float32Array [0.2157987803220749, -0.09140099585056305, ...],
+ * //   dims: [1, 8, 384]
  * // }
+ *
+ * // You can convert this Tensor to a nested JavaScript array using `.tolist()`:
+ * console.log(output.tolist());
  * ```
  *
- * **Example:** Run feature extraction with `bert-base-uncased` (with pooling/normalization).
+ * **Example:** Run feature extraction using `onnx-community/all-MiniLM-L6-v2-ONNX` (with pooling and normalization).
  * ```javascript
- * const extractor = await pipeline('feature-extraction', 'Xenova/bert-base-uncased', { revision: 'default' });
+ * import { pipeline } from '@huggingface/transformers';
+ *
+ * const extractor = await pipeline('feature-extraction', 'onnx-community/all-MiniLM-L6-v2-ONNX');
  * const output = await extractor('This is a simple test.', { pooling: 'mean', normalize: true });
  * // Tensor {
  * //   type: 'float32',
- * //   data: Float32Array [0.03373778983950615, -0.010106077417731285, ...],
- * //   dims: [1, 768]
- * // }
- * ```
- *
- * **Example:** Calculating embeddings with `sentence-transformers` models.
- * ```javascript
- * const extractor = await pipeline('feature-extraction', 'Xenova/all-MiniLM-L6-v2');
- * const output = await extractor('This is a simple test.', { pooling: 'mean', normalize: true });
- * // Tensor {
- * //   type: 'float32',
- * //   data: Float32Array [0.09094982594251633, -0.014774246141314507, ...],
+ * //   data: Float32Array [0.09528215229511261, -0.024730168282985687, ...],
  * //   dims: [1, 384]
  * // }
+ * 
+ * // You can convert this Tensor to a nested JavaScript array using `.tolist()`:
+ * console.log(output.tolist());
  * ```
- * **Example:** Calculating binary embeddings with `sentence-transformers` models.
+ *
+ * **Example:** Run feature extraction using `onnx-community/all-MiniLM-L6-v2-ONNX` models (with pooling and binary quantization).
  * ```javascript
- * const extractor = await pipeline('feature-extraction', 'Xenova/all-MiniLM-L6-v2');
+ * const extractor = await pipeline('feature-extraction', 'onnx-community/all-MiniLM-L6-v2-ONNX');
  * const output = await extractor('This is a simple test.', { pooling: 'mean', quantize: true, precision: 'binary' });
  * // Tensor {
  * //   type: 'int8',
- * //   data: Int8Array [49, 108, 24, ...],
+ * //   data: Int8Array [49, 108, 25, ...],
  * //   dims: [1, 48]
  * // }
+ * 
+ * // You can convert this Tensor to a nested JavaScript array using `.tolist()`:
+ * console.log(output.tolist());
  * ```
  */
 export class FeatureExtractionPipeline
