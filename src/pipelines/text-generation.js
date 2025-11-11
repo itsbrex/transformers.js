@@ -27,6 +27,8 @@ function isChat(x) {
  * @typedef {Object} TextGenerationSpecificParams Parameters specific to text-generation pipelines.
  * @property {boolean} [add_special_tokens] Whether or not to add special tokens when tokenizing the sequences.
  * @property {boolean} [return_full_text=true] If set to `false` only added text is returned, otherwise the full text is returned.
+ * @property {Object} [tokenizer_encode_kwargs] Additional keyword arguments to pass along to the encoding step of the tokenizer.
+ * If the text input is a chat, it is passed to `apply_chat_template`. Otherwise, it is passed to the tokenizer's call function.
  * @typedef {import('../generation/configuration_utils.js').GenerationConfig & TextGenerationSpecificParams} TextGenerationConfig
  *
  * @callback TextGenerationPipelineCallbackString
@@ -108,6 +110,8 @@ export class TextGenerationPipeline
             (this.tokenizer.add_bos_token || this.tokenizer.add_eos_token) ??
             false;
 
+        let tokenizer_kwargs = generate_kwargs.tokenizer_encode_kwargs;
+
         // Normalize inputs
         /** @type {string[]} */
         let inputs;
@@ -132,10 +136,13 @@ export class TextGenerationPipeline
                     this.tokenizer.apply_chat_template(x, {
                         tokenize: false,
                         add_generation_prompt: true,
+                        ...tokenizer_kwargs,
                     }),
                 )
             );
-            add_special_tokens = false; // Chat template handles this already
+            // Chat template handles these already
+            add_special_tokens = false;
+            tokenizer_kwargs = undefined;
         }
 
         // By default, return full text
@@ -146,6 +153,7 @@ export class TextGenerationPipeline
             add_special_tokens,
             padding: true,
             truncation: true,
+            ...tokenizer_kwargs,
         });
 
         const outputTokenIds = /** @type {Tensor} */ (
