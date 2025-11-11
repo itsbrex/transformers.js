@@ -153,9 +153,8 @@ const SUPPORTED_TASKS = Object.freeze({
         pipeline: TextGenerationPipeline,
         model: AutoModelForCausalLM,
         default: {
-            // TODO: replace with original
-            // "model": "gpt2",
-            model: 'Xenova/gpt2',
+            model: 'onnx-community/Qwen3-0.6B-ONNX',
+            dtype: 'q4',
         },
         type: 'text',
     },
@@ -447,6 +446,9 @@ export async function pipeline(
     if (!model) {
         model = pipelineInfo.default.model;
         console.log(`No model specified. Using default model: "${model}".`);
+    }
+    if (!dtype && pipelineInfo.default.dtype) {
+        dtype = pipelineInfo.default.dtype;
     }
 
     const pretrainedOptions = {

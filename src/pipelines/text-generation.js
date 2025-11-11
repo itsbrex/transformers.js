@@ -1,11 +1,11 @@
 import { Pipeline } from './_base.js';
 
-import { Tensor, topk } from '../utils/tensor.js';
-import { softmax } from '../utils/maths.js';
+import { Tensor } from '../utils/tensor.js';
 
 /**
  * @typedef {import('./_base.js').TextPipelineConstructorArgs} TextPipelineConstructorArgs
  * @typedef {import('./_base.js').Disposable} Disposable
+ * @typedef {import('../tokenizers.js').Message[]} Chat
  */
 
 function isChat(x) {
@@ -13,10 +13,15 @@ function isChat(x) {
 }
 
 /**
- * @typedef {import('../tokenizers.js').Message[]} Chat
+ * @typedef {Object} TextGenerationSingleString
+ * @property {string} generated_text The generated text.
+ * @typedef {TextGenerationSingleString[]} TextGenerationStringOutput
  *
- * @typedef {Object} TextGenerationSingle
- * @property {string|Chat} generated_text The generated text.
+ * @typedef {Object} TextGenerationSingleChat
+ * @property {Chat} generated_text The generated chat.
+ * @typedef {TextGenerationSingleChat[]} TextGenerationChatOutput
+ *
+ * @typedef {TextGenerationSingleString | TextGenerationSingleChat} TextGenerationSingle
  * @typedef {TextGenerationSingle[]} TextGenerationOutput
  *
  * @typedef {Object} TextGenerationSpecificParams Parameters specific to text-generation pipelines.
@@ -24,10 +29,27 @@ function isChat(x) {
  * @property {boolean} [return_full_text=true] If set to `false` only added text is returned, otherwise the full text is returned.
  * @typedef {import('../generation/configuration_utils.js').GenerationConfig & TextGenerationSpecificParams} TextGenerationConfig
  *
- * @callback TextGenerationPipelineCallback Complete the prompt(s) given as inputs.
- * @param {string|string[]|Chat|Chat[]} texts One or several prompts (or one list of prompts) to complete.
+ * @callback TextGenerationPipelineCallbackString
+ * @param {string} texts One prompt to complete.
  * @param {Partial<TextGenerationConfig>} [options] Additional keyword arguments to pass along to the generate method of the model.
- * @returns {Promise<TextGenerationOutput|TextGenerationOutput[]>} An array or object containing the generated texts.
+ * @returns {Promise<TextGenerationStringOutput>} An array containing the generated text(s).
+ *
+ * @callback TextGenerationPipelineCallbackChat
+ * @param {Chat} texts One chat to complete.
+ * @param {Partial<TextGenerationConfig>} [options] Additional keyword arguments to pass along to the generate method of the model.
+ * @returns {Promise<TextGenerationChatOutput>} An array containing the generated chat(s).
+ *
+ * @callback TextGenerationPipelineCallbackStringBatched
+ * @param {string[]} texts Several prompts to complete.
+ * @param {Partial<TextGenerationConfig>} [options] Additional keyword arguments to pass along to the generate method of the model.
+ * @returns {Promise<TextGenerationStringOutput[]>} An array of arrays, each containing the generated text(s) for the corresponding input.
+ *
+ * @callback TextGenerationPipelineCallbackChatBatched
+ * @param {Chat[]} texts Several chats to complete.
+ * @param {Partial<TextGenerationConfig>} [options] Additional keyword arguments to pass along to the generate method of the model.
+ * @returns {Promise<TextGenerationChatOutput[]>} An array of arrays, each containing the generated chat(s) for the corresponding input.
+ *
+ * @typedef {TextGenerationPipelineCallbackString & TextGenerationPipelineCallbackChat & TextGenerationPipelineCallbackStringBatched & TextGenerationPipelineCallbackChatBatched} TextGenerationPipelineCallback
  *
  * @typedef {TextPipelineConstructorArgs & TextGenerationPipelineCallback & Disposable} TextGenerationPipelineType
  */
@@ -37,63 +59,45 @@ function isChat(x) {
  * This pipeline predicts the words that will follow a specified text prompt.
  * NOTE: For the full list of generation parameters, see [`GenerationConfig`](./utils/generation#module_utils/generation.GenerationConfig).
  *
- * **Example:** Text generation with `Xenova/distilgpt2` (default settings).
+ * **Example:** Text generation with `HuggingFaceTB/SmolLM2-135M` (default settings).
  * ```javascript
- * const generator = await pipeline('text-generation', 'Xenova/distilgpt2');
- * const text = 'I enjoy walking with my cute dog,';
- * const output = await generator(text);
- * // [{ generated_text: "I enjoy walking with my cute dog, and I love to play with the other dogs." }]
+ * import { pipeline } from '@huggingface/transformers';
+ *
+ * const generator = await pipeline('text-generation', 'onnx-community/SmolLM2-135M-ONNX');
+ * const text = 'Once upon a time,';
+ * const output = await generator(text, { max_new_tokens: 8 });
+ * // [{ generated_text: 'Once upon a time, there was a little girl named Lily.' }]
  * ```
  *
- * **Example:** Text generation with `Xenova/distilgpt2` (custom settings).
+ * **Example:** Chat completion with `onnx-community/Qwen3-0.6B-ONNX`.
  * ```javascript
- * const generator = await pipeline('text-generation', 'Xenova/distilgpt2');
- * const text = 'Once upon a time, there was';
- * const output = await generator(text, {
- *   temperature: 2,
- *   max_new_tokens: 10,
- *   repetition_penalty: 1.5,
- *   no_repeat_ngram_size: 2,
- *   num_beams: 2,
- *   num_return_sequences: 2,
- * });
- * // [{
- * //   "generated_text": "Once upon a time, there was an abundance of information about the history and activities that"
- * // }, {
- * //   "generated_text": "Once upon a time, there was an abundance of information about the most important and influential"
- * // }]
- * ```
+ * import { pipeline, TextStreamer } from '@huggingface/transformers';
  *
- * **Example:** Run code generation with `Xenova/codegen-350M-mono`.
- * ```javascript
- * const generator = await pipeline('text-generation', 'Xenova/codegen-350M-mono');
- * const text = 'def fib(n):';
- * const output = await generator(text, {
- *   max_new_tokens: 44,
+ * // Create a text generation pipeline
+ * const generator = await pipeline(
+ *   'text-generation',
+ *   'onnx-community/Qwen3-0.6B-ONNX',
+ *   { dtype: 'q4f16' },
+ * );
+ *
+ * // Define the list of messages
+ * const messages = [
+ *   { role: 'system', content: 'You are a helpful assistant.' },
+ *   { role: 'user', content: 'Write me a poem about Machine Learning.' },
+ * ];
+ *
+ * // Generate a response
+ * const output = await generator(messages, {
+ *   max_new_tokens: 512,
+ *   do_sample: false,
+ *   streamer: new TextStreamer(generator.tokenizer, { skip_prompt: true, skip_special_tokens: true }),
  * });
- * // [{
- * //   generated_text: 'def fib(n):\n' +
- * //     '    if n == 0:\n' +
- * //     '        return 0\n' +
- * //     '    elif n == 1:\n' +
- * //     '        return 1\n' +
- * //     '    else:\n' +
- * //     '        return fib(n-1) + fib(n-2)\n'
- * // }]
+ * console.log(output[0].generated_text.at(-1)?.content);
  * ```
  */
 export class TextGenerationPipeline
     extends /** @type {new (options: TextPipelineConstructorArgs) => TextGenerationPipelineType} */ (Pipeline)
 {
-    /**
-     * Create a new TextGenerationPipeline.
-     * @param {TextPipelineConstructorArgs} options An object used to instantiate the pipeline.
-     */
-    constructor(options) {
-        super(options);
-    }
-
-    /** @type {TextGenerationPipelineCallback} */
     async _call(texts, generate_kwargs = {}) {
         let isBatched = false;
         let isChatInput = false;
@@ -173,11 +177,14 @@ export class TextGenerationPipeline
                 // Trim the decoded text to only include the generated part
                 decoded[i] = decoded[i].slice(promptLengths[textIndex]);
             }
-            toReturn[textIndex].push({
+            toReturn[textIndex].push(/** @type {TextGenerationSingle} */({
                 generated_text: isChatInput
-                    ? [.../** @type {Chat[]} */ (texts)[textIndex], { role: 'assistant', content: decoded[i] }]
-                    : decoded[i],
-            });
+                    ? [
+                        ...((/** @type {Chat[]} */(texts)[textIndex])),
+                        { role: 'assistant', content: decoded[i] },
+                    ]
+                    : decoded[i]
+            }));
         }
         return !isBatched && toReturn.length === 1 ? toReturn[0] : toReturn;
     }
