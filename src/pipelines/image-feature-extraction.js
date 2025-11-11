@@ -24,24 +24,28 @@ import { Tensor } from '../utils/tensor.js';
  * Image feature extraction pipeline using no model head. This pipeline extracts the hidden
  * states from the base transformer, which can be used as features in downstream tasks.
  *
- * **Example:** Perform image feature extraction with `Xenova/vit-base-patch16-224-in21k`.
+ * **Example:** Perform image feature extraction with `onnx-community/dinov3-vits16-pretrain-lvd1689m-ONNX`.
  * ```javascript
- * const image_feature_extractor = await pipeline('image-feature-extraction', 'Xenova/vit-base-patch16-224-in21k');
- * const url = 'https://huggingface.co/datasets/huggingface/documentation-images/resolve/main/cats.png';
- * const features = await image_feature_extractor(url);
+ * import { pipeline } from '@huggingface/transformers';
+ *
+ * const image_feature_extractor = await pipeline('image-feature-extraction', 'onnx-community/dinov3-vits16-pretrain-lvd1689m-ONNX');
+ * const image = 'https://huggingface.co/datasets/huggingface/documentation-images/resolve/main/cats.png';
+ * const features = await image_feature_extractor(image);
  * // Tensor {
- * //   dims: [ 1, 197, 768 ],
+ * //   dims: [ 1, 201, 384 ],
  * //   type: 'float32',
- * //   data: Float32Array(151296) [ ... ],
- * //   size: 151296
+ * //   data: Float32Array(77184) [ ... ],
+ * //   size: 77184
  * // }
  * ```
  *
  * **Example:** Compute image embeddings with `Xenova/clip-vit-base-patch32`.
  * ```javascript
+ * import { pipeline } from '@huggingface/transformers';
+ *
  * const image_feature_extractor = await pipeline('image-feature-extraction', 'Xenova/clip-vit-base-patch32');
- * const url = 'https://huggingface.co/datasets/huggingface/documentation-images/resolve/main/cats.png';
- * const features = await image_feature_extractor(url);
+ * const image = 'https://huggingface.co/datasets/huggingface/documentation-images/resolve/main/cats.png';
+ * const features = await image_feature_extractor(image);
  * // Tensor {
  * //   dims: [ 1, 512 ],
  * //   type: 'float32',
@@ -53,14 +57,6 @@ import { Tensor } from '../utils/tensor.js';
 export class ImageFeatureExtractionPipeline
     extends /** @type {new (options: ImagePipelineConstructorArgs) => ImageFeatureExtractionPipelineType} */ (Pipeline)
 {
-    /**
-     * Create a new ImageFeatureExtractionPipeline.
-     * @param {ImagePipelineConstructorArgs} options An object used to instantiate the pipeline.
-     */
-    constructor(options) {
-        super(options);
-    }
-
     /** @type {ImageFeatureExtractionPipelineCallback} */
     async _call(images, { pool = null } = {}) {
         const preparedImages = await prepareImages(images);

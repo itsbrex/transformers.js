@@ -355,9 +355,7 @@ const SUPPORTED_TASKS = Object.freeze({
         pipeline: ImageFeatureExtractionPipeline,
         model: [AutoModelForImageFeatureExtraction, AutoModel],
         default: {
-            // TODO: replace with original
-            // "model": "google/vit-base-patch16-224",
-            model: 'Xenova/vit-base-patch16-224-in21k',
+            model: 'onnx-community/dinov3-vits16-pretrain-lvd1689m-ONNX',
         },
         type: 'image',
     },
