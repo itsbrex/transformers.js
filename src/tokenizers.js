@@ -2269,7 +2269,7 @@ class MetaspacePreTokenizer extends PreTokenizer {
             // and (2) either:
             //  (a) prepend_scheme is 'always'
             //  (b) prepend_scheme is 'first' and this is the first section
-            (this.prepend_scheme === 'always' || (this.prepend_scheme === 'first' && section_index === 0))
+            && (this.prepend_scheme === 'always' || (this.prepend_scheme === 'first' && section_index === 0))
         ) {
             normalized = this.strRep + normalized;
         }
