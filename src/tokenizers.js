@@ -2264,12 +2264,12 @@ class MetaspacePreTokenizer extends PreTokenizer {
         if (
             // We add a prefix space if:
             //  (1) The normalized token does not already start with the replacement character.
-            !normalized.startsWith(this.replacement)
+            !normalized.startsWith(this.replacement) &&
 
             // and (2) either:
             //  (a) prepend_scheme is 'always'
             //  (b) prepend_scheme is 'first' and this is the first section
-            && (this.prepend_scheme === 'always' || (this.prepend_scheme === 'first' && section_index === 0))
+            (this.prepend_scheme === 'always' || (this.prepend_scheme === 'first' && section_index === 0))
         ) {
             normalized = this.strRep + normalized;
         }
