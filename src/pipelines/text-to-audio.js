@@ -41,6 +41,8 @@ import { AutoModel } from '../models.js';
  *
  * **Example:** Generate audio from text with `onnx-community/Supertonic-TTS-ONNX`.
  * ```javascript
+ * import { pipeline } from '@huggingface/transformers';
+ *
  * const synthesizer = await pipeline('text-to-speech', 'onnx-community/Supertonic-TTS-ONNX');
  * const speaker_embeddings = 'https://huggingface.co/onnx-community/Supertonic-TTS-ONNX/resolve/main/voices/F1.bin';
  * const output = await synthesizer('Hello there, how are you doing?', { speaker_embeddings });
@@ -55,6 +57,8 @@ import { AutoModel } from '../models.js';
  *
  * **Example:** Multilingual speech generation with `Xenova/mms-tts-fra`. See [here](https://huggingface.co/models?pipeline_tag=text-to-speech&other=vits&sort=trending) for the full list of available languages (1107).
  * ```javascript
+ * import { pipeline } from '@huggingface/transformers';
+ *
  * const synthesizer = await pipeline('text-to-speech', 'Xenova/mms-tts-fra');
  * const output = await synthesizer('Bonjour');
  * // RawAudio {
