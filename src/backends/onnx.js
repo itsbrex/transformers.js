@@ -192,12 +192,10 @@ if (ONNX_ENV?.wasm) {
     // (Optional) Set path to wasm files. This will override the default path search behavior of onnxruntime-web.
     // By default, we only do this if we are not in a service worker and the wasmPaths are not already set.
     if (
-        (
-            // @ts-ignore Cannot find name 'ServiceWorkerGlobalScope'.ts(2304)
-            !(typeof ServiceWorkerGlobalScope !== 'undefined' && self instanceof ServiceWorkerGlobalScope) &&
-            ONNX_ENV.versions?.web &&
-            !ONNX_ENV.wasm.wasmPaths
-        )
+        // @ts-ignore Cannot find name 'ServiceWorkerGlobalScope'.ts(2304)
+        !(typeof ServiceWorkerGlobalScope !== 'undefined' && self instanceof ServiceWorkerGlobalScope) &&
+        ONNX_ENV.versions?.web &&
+        !ONNX_ENV.wasm.wasmPaths
     ) {
         const wasmPathPrefix = `https://cdn.jsdelivr.net/npm/onnxruntime-web@${ONNX_ENV.versions.web}/dist/`;
 
