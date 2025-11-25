@@ -298,7 +298,6 @@ export function getCacheShapes(config, options) {
         /** @type {Record<string, number[]>} */
         const cache_values = {};
 
-        // @ts-expect-error TS2339
         const {
             layer_types,
             num_attention_heads,
@@ -310,7 +309,7 @@ export function getCacheShapes(config, options) {
             mamba_d_state,
             mamba_n_groups,
             mamba_expand,
-        } = config;
+        } = /** @type {any} */(config);
         const head_dim = hidden_size / num_attention_heads;
         const batch_size = options?.batch_size ?? 1;
         const conv_d_inner = mamba_expand * hidden_size + 2 * mamba_n_groups * mamba_d_state;
