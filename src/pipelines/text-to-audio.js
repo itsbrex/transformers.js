@@ -27,7 +27,7 @@ import { AutoModel } from '../models.js';
  *
  * @callback TextToAudioPipelineCallback Generates speech/audio from the inputs.
  * @param {string|string[]} texts The text(s) to generate.
- * @param {TextToAudioPipelineOptions} options Parameters passed to the model generation/forward method.
+ * @param {TextToAudioPipelineOptions} [options] Parameters passed to the model generation/forward method.
  * @returns {Promise<TextToAudioOutput>} An object containing the generated audio and sampling rate.
  *
  * @typedef {TextToAudioPipelineConstructorArgs & TextToAudioPipelineCallback & Disposable} TextToAudioPipelineType
