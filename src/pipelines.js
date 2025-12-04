@@ -210,9 +210,8 @@ const SUPPORTED_TASKS = Object.freeze({
         model: [AutoModelForTextToWaveform, AutoModelForTextToSpectrogram],
         processor: [AutoProcessor, /* Some don't use a processor */ null],
         default: {
-            // TODO: replace with original
-            // "model": "microsoft/speecht5_tts",
-            model: 'Xenova/speecht5_tts',
+            model: 'onnx-community/Supertonic-TTS-ONNX',
+            dtype: 'fp32',
         },
         type: 'text',
     },
