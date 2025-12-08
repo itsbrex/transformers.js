@@ -108,6 +108,7 @@ function getNormalizedConfig(config) {
             mapping['num_layers'] = 'num_hidden_layers';
             mapping['hidden_size'] = 'hidden_size';
             break;
+        case 'gpt_oss':
         case 'llama':
         case 'llama4_text':
         case 'nanochat':

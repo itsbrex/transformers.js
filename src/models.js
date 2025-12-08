@@ -2051,7 +2051,10 @@ export class PreTrainedModel extends Callable {
             // In most cases, this will be [batch_size, 1, vocab_size]
             // So, we select the last token's logits:
             // (equivalent to `logits = outputs.logits[:, -1, :]`)
-            const logits = outputs.logits.slice(null, -1, null);
+            // The `.to('float32')` is necessary for models with float16 logits,
+            // and is a no-op for float32 logits.
+            // TODO: Support float16 sampling in the sampler directly
+            const logits = outputs.logits.slice(null, -1, null).to('float32');
 
             const next_tokens_scores = prepared_logits_processor(all_input_ids, logits);
 
@@ -4675,6 +4678,15 @@ export class GPT2LMHeadModel extends GPT2PreTrainedModel {}
 // TODO
 // }
 //////////////////////////////////////////////////
+
+
+//////////////////////////////////////////////////
+// GPT OSS models
+export class GptOssPreTrainedModel extends PreTrainedModel {}
+export class GptOssModel extends GptOssPreTrainedModel {}
+export class GptOssForCausalLM extends GptOssPreTrainedModel {}
+//////////////////////////////////////////////////
+
 
 //////////////////////////////////////////////////
 // JAIS models
@@ -8267,6 +8279,7 @@ const MODEL_MAPPING_NAMES_DECODER_ONLY = new Map([
     ['bloom', ['BloomModel', BloomModel]],
     ['jais', ['JAISModel', JAISModel]],
     ['gpt2', ['GPT2Model', GPT2Model]],
+    ['gpt_oss', ['GptOssModel', GptOssModel]],
     ['gptj', ['GPTJModel', GPTJModel]],
     ['gpt_bigcode', ['GPTBigCodeModel', GPTBigCodeModel]],
     ['gpt_neo', ['GPTNeoModel', GPTNeoModel]],
@@ -8380,6 +8393,7 @@ const MODEL_FOR_SEQ_TO_SEQ_CAUSAL_LM_MAPPING_NAMES = new Map([
 const MODEL_FOR_CAUSAL_LM_MAPPING_NAMES = new Map([
     ['bloom', ['BloomForCausalLM', BloomForCausalLM]],
     ['gpt2', ['GPT2LMHeadModel', GPT2LMHeadModel]],
+    ['gpt_oss', ['GptOssForCausalLM', GptOssForCausalLM]],
     ['jais', ['JAISLMHeadModel', JAISLMHeadModel]],
     ['gptj', ['GPTJForCausalLM', GPTJForCausalLM]],
     ['gpt_bigcode', ['GPTBigCodeForCausalLM', GPTBigCodeForCausalLM]],
