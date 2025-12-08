@@ -4823,17 +4823,24 @@ export class MobileLLMForCausalLM extends MobileLLMPreTrainedModel {}
 //////////////////////////////////////////////////
 
 //////////////////////////////////////////////////
-// OLMo models
+// Olmo models
 export class OlmoPreTrainedModel extends PreTrainedModel {}
 export class OlmoModel extends OlmoPreTrainedModel {}
 export class OlmoForCausalLM extends OlmoPreTrainedModel {}
 //////////////////////////////////////////////////
 
 //////////////////////////////////////////////////
-// OLMo2 models
+// Olmo2 models
 export class Olmo2PreTrainedModel extends PreTrainedModel {}
 export class Olmo2Model extends Olmo2PreTrainedModel {}
 export class Olmo2ForCausalLM extends Olmo2PreTrainedModel {}
+//////////////////////////////////////////////////
+
+//////////////////////////////////////////////////
+// Olmo3 models
+export class Olmo3PreTrainedModel extends PreTrainedModel {}
+export class Olmo3Model extends Olmo3PreTrainedModel {}
+export class Olmo3ForCausalLM extends Olmo3PreTrainedModel {}
 //////////////////////////////////////////////////
 
 //////////////////////////////////////////////////
@@ -8274,6 +8281,7 @@ const MODEL_MAPPING_NAMES_DECODER_ONLY = new Map([
     ['exaone', ['ExaoneModel', ExaoneModel]],
     ['olmo', ['OlmoModel', OlmoModel]],
     ['olmo2', ['Olmo2Model', Olmo2Model]],
+    ['olmo3', ['Olmo3Model', Olmo3Model]],
     ['mobilellm', ['MobileLLMModel', MobileLLMModel]],
     ['granite', ['GraniteModel', GraniteModel]],
     ['granitemoehybrid', ['GraniteMoeHybridModel', GraniteMoeHybridModel]],
@@ -8388,6 +8396,7 @@ const MODEL_FOR_CAUSAL_LM_MAPPING_NAMES = new Map([
     ['exaone', ['ExaoneForCausalLM', ExaoneForCausalLM]],
     ['olmo', ['OlmoForCausalLM', OlmoForCausalLM]],
     ['olmo2', ['Olmo2ForCausalLM', Olmo2ForCausalLM]],
+    ['olmo3', ['Olmo3ForCausalLM', Olmo3ForCausalLM]],
     ['mobilellm', ['MobileLLMForCausalLM', MobileLLMForCausalLM]],
     ['granite', ['GraniteForCausalLM', GraniteForCausalLM]],
     ['granitemoehybrid', ['GraniteMoeHybridForCausalLM', GraniteMoeHybridForCausalLM]],
