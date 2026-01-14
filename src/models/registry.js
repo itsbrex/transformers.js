@@ -160,6 +160,7 @@ const MODEL_MAPPING_NAMES_DECODER_ONLY = new Map([
     ['falcon', 'FalconModel'],
     ['stablelm', 'StableLmModel'],
     ['modernbert-decoder', 'ModernBertDecoderModel'],
+    ['hunyuan_v1_dense', 'HunYuanDenseV1Model'],
 ]);
 
 export const MODEL_FOR_SPEECH_SEQ_2_SEQ_MAPPING_NAMES = new Map([
@@ -276,6 +277,7 @@ export const MODEL_FOR_CAUSAL_LM_MAPPING_NAMES = new Map([
     ['trocr', 'TrOCRForCausalLM'],
     ['stablelm', 'StableLmForCausalLM'],
     ['modernbert-decoder', 'ModernBertDecoderForCausalLM'],
+    ['hunyuan_v1_dense', 'HunYuanDenseV1ForCausalLM'],
 
     // Also image-text-to-text
     ['phi3_v', 'Phi3VForCausalLM'],

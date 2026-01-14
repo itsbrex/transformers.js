@@ -66,6 +66,7 @@ export * from './groupvit/index.js';
 export * from './helium/index.js';
 export * from './hiera/index.js';
 export * from './hubert/index.js';
+export * from './hunyuan_v1_dense/index.js';
 export * from './idefics3/index.js';
 export * from './ijepa/index.js';
 export * from './jais/index.js';

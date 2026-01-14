@@ -146,6 +146,7 @@ function getNormalizedConfig(config) {
         case 'glm':
         case 'helium':
         case 'ernie4_5':
+        case 'hunyuan_v1_dense':
             mapping['num_heads'] = 'num_key_value_heads';
             mapping['num_layers'] = 'num_hidden_layers';
             mapping['dim_kv'] = 'head_dim';
