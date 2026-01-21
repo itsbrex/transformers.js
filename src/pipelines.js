@@ -13,7 +13,7 @@
  * @module pipelines
  */
 
-import { AutoTokenizer } from './tokenizers.js';
+import { AutoTokenizer } from './models/auto/tokenization_auto.js';
 import { AutoProcessor } from './models/auto/processing_auto.js';
 import {
     AutoModel,
@@ -39,7 +39,7 @@ import {
     AutoModelForImageToImage,
     AutoModelForDepthEstimation,
     AutoModelForImageFeatureExtraction,
-} from './models.js';
+} from './models/auto/modeling_auto.js';
 
 import { dispatchCallback } from './utils/core.js';
 
