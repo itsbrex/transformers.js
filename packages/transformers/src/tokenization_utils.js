@@ -164,6 +164,8 @@ export class PreTrainedTokenizer extends Callable {
 
         this.config = tokenizerConfig;
 
+        this.padding_side = tokenizerConfig.padding_side ?? this.padding_side;
+
         // Set mask token if present (otherwise will be undefined, which is fine)
         this.mask_token = getTokenFromConfig(tokenizerConfig, 'mask_token');
         this.mask_token_id = this._tokenizer.token_to_id(this.mask_token);
