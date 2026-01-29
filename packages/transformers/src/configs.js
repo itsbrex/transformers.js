@@ -73,6 +73,7 @@ function getNormalizedConfig(config) {
         case 'smolvlm':
         case 'gemma3n':
         case 'chatterbox':
+        case 'mistral3':
             // @ts-expect-error TS2339
             init_normalized_config = getNormalizedConfig(config.text_config);
             break;
@@ -148,6 +149,8 @@ function getNormalizedConfig(config) {
         case 'ernie4_5':
         case 'hunyuan_v1_dense':
         case 'falcon_h1':
+        case 'ministral':
+        case 'ministral3':
             mapping['num_heads'] = 'num_key_value_heads';
             mapping['num_layers'] = 'num_hidden_layers';
             mapping['dim_kv'] = 'head_dim';
