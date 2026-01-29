@@ -15,6 +15,7 @@ on:
 
 env:
   TESTING_REMOTELY: true
+  ONNXRUNTIME_NODE_INSTALL: skip
 
 jobs:
   build:

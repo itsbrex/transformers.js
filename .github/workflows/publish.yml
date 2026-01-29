@@ -1,7 +1,12 @@
 name: Publish Package to npmjs
+
 on:
   release:
     types: [published]
+
+env:
+  ONNXRUNTIME_NODE_INSTALL: skip
+
 jobs:
   build:
     runs-on: ubuntu-latest
