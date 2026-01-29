@@ -1,11 +1,10 @@
-
 import { Processor } from '../../processing_utils.js';
-import { AutoImageProcessor } from "../auto/image_processing_auto.js";
+import { AutoImageProcessor } from '../auto/image_processing_auto.js';
 import { AutoTokenizer } from '../auto/tokenization_auto.js';
 
 export class PixtralProcessor extends Processor {
-    static tokenizer_class = AutoTokenizer
-    static image_processor_class = AutoImageProcessor
+    static tokenizer_class = AutoTokenizer;
+    static image_processor_class = AutoImageProcessor;
     static uses_processor_config = true;
 
     /**
@@ -14,7 +13,6 @@ export class PixtralProcessor extends Processor {
 
     // `images` is required, `text` is optional
     async _call(/** @type {RawImage|RawImage[]} */ images, text = null, kwargs = {}) {
-        
         const image_inputs = await this.image_processor(images, kwargs);
 
         if (text) {
@@ -37,12 +35,12 @@ export class PixtralProcessor extends Processor {
                 text[i] = text[i].replace(image_token, full);
             }
         }
-        
+
         const text_inputs = text ? this.tokenizer(text, kwargs) : {};
 
         return {
             ...image_inputs,
             ...text_inputs,
-        }
+        };
     }
 }

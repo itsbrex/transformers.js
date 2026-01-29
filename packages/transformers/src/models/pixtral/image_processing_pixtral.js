@@ -1,8 +1,6 @@
-
 import { ImageProcessor } from '../../image_processors_utils.js';
 
 export class PixtralImageProcessor extends ImageProcessor {
-
     /** @type {ImageProcessor['get_resize_output_image_size']} */
     get_resize_output_image_size(image, size) {
         const { longest_edge } = size;
