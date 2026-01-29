@@ -155,6 +155,8 @@ const MODEL_MAPPING_NAMES_DECODER_ONLY = new Map([
     ['mpt', 'MptModel'],
     ['opt', 'OPTModel'],
     ['mistral', 'MistralModel'],
+    ['ministral', 'MinistralModel'],
+    ['ministral3', 'Ministral3Model'],
     ['ernie4_5', 'Ernie4_5_Model'],
     ['starcoder2', 'Starcoder2Model'],
     ['falcon', 'FalconModel'],
@@ -272,6 +274,8 @@ export const MODEL_FOR_CAUSAL_LM_MAPPING_NAMES = new Map([
     ['opt', 'OPTForCausalLM'],
     ['mbart', 'MBartForCausalLM'],
     ['mistral', 'MistralForCausalLM'],
+    ['ministral', 'MinistralForCausalLM'],
+    ['ministral3', 'Ministral3ForCausalLM'],
     ['ernie4_5', 'Ernie4_5_ForCausalLM'],
     ['starcoder2', 'Starcoder2ForCausalLM'],
     ['falcon', 'FalconForCausalLM'],
@@ -344,6 +348,7 @@ const MODEL_FOR_IMAGE_TEXT_TO_TEXT_MAPPING_NAMES = new Map([
     ['paligemma', 'PaliGemmaForConditionalGeneration'],
     ['llava_qwen2', 'LlavaQwen2ForCausalLM'],
     ['gemma3n', 'Gemma3nForConditionalGeneration'],
+    ['mistral3', 'Mistral3ForConditionalGeneration'],
 ]);
 
 const MODEL_FOR_AUDIO_TEXT_TO_TEXT_MAPPING_NAMES = new Map([

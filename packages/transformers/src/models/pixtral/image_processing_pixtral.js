@@ -1,6 +1,5 @@
-import {
-    ImageProcessor,
-} from "../../base/image_processors_utils.js";
+
+import { ImageProcessor } from '../../image_processors_utils.js';
 
 export class PixtralImageProcessor extends ImageProcessor {
 
