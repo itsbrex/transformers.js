@@ -164,6 +164,7 @@ const MODEL_MAPPING_NAMES_DECODER_ONLY = new Map([
     ['stablelm', 'StableLmModel'],
     ['modernbert-decoder', 'ModernBertDecoderModel'],
     ['hunyuan_v1_dense', 'HunYuanDenseV1Model'],
+    ['youtu', 'YoutuModel'],
 ]);
 
 export const MODEL_FOR_SPEECH_SEQ_2_SEQ_MAPPING_NAMES = new Map([
@@ -284,6 +285,7 @@ export const MODEL_FOR_CAUSAL_LM_MAPPING_NAMES = new Map([
     ['stablelm', 'StableLmForCausalLM'],
     ['modernbert-decoder', 'ModernBertDecoderForCausalLM'],
     ['hunyuan_v1_dense', 'HunYuanDenseV1ForCausalLM'],
+    ['youtu', 'YoutuForCausalLM'],
 
     // Also image-text-to-text
     ['phi3_v', 'Phi3VForCausalLM'],
