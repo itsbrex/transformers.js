@@ -21,8 +21,8 @@ importers:
         specifier: ^0.5.4
         version: 0.5.4
       '@huggingface/tokenizers':
-        specifier: ^0.1.0
-        version: 0.1.0
+        specifier: ^0.1.1
+        version: 0.1.1
       onnxruntime-node:
         specifier: 1.25.0-dev.20260125-727db0d3dc
         version: 1.25.0-dev.20260125-727db0d3dc
@@ -394,8 +394,8 @@ packages:
     resolution: {integrity: sha512-VoQJywjpjy2D88Oj0BTHRuS8JCbUgoOg5t1UGgbtGh2fRia9Dx/k6Wf8FqrEWIvWK9fAkfJeeLB9fcSpCNPCpw==}
     engines: {node: '>=18'}
 
-  '@huggingface/tokenizers@0.1.0':
-    resolution: {integrity: sha512-gnOWcxTCyHG6ZHWbMay0H7bQTF6Xw5dqKg9juTy037gaGqNbZilEyE8/8VSAHBhvWFJKTFujetn8XbD+d2pzQQ==}
+  '@huggingface/tokenizers@0.1.1':
+    resolution: {integrity: sha512-hNVdOq4kAONjz9FqL6agX1vfpJ57Z9cUDQSVSqRMLT1x31y84XbOXDw2WdxCUiseizA+LEHehwwLLkGsyu8iXQ==}
 
   '@img/colour@1.0.0':
     resolution: {integrity: sha512-A5P/LfWGFSl6nsckYtjw9da+19jB8hkJ6ACTGcDfEJ0aE+l2n2El7dsVM7UVHZQ9s2lmYMWlrS21YLy2IR1LUw==}
@@ -2330,7 +2330,7 @@ snapshots:
 
   '@huggingface/jinja@0.5.4': {}
 
-  '@huggingface/tokenizers@0.1.0': {}
+  '@huggingface/tokenizers@0.1.1': {}
 
   '@img/colour@1.0.0': {}
 
