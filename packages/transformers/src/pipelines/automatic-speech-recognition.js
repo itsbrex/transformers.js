@@ -129,7 +129,16 @@ export class AutomaticSpeechRecognitionPipeline
         Pipeline
     )
 {
+    _default_generation_config = {
+        // TODO: figure out good defaults for ASR generation parameters
+        // max_new_tokens: 256,
+        // num_beams: 5,
+    };
     async _call(audio, kwargs = {}) {
+        kwargs = {
+            ...this._default_generation_config,
+            ...kwargs,
+        };
         switch (this.model.config.model_type) {
             case 'whisper':
             case 'lite-whisper':

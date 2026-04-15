@@ -87,6 +87,12 @@ function isChat(x) {
 export class TextGenerationPipeline
     extends /** @type {new (options: TextPipelineConstructorArgs) => TextGenerationPipelineType} */ (Pipeline)
 {
+    _default_generation_config = {
+        max_new_tokens: 256,
+        // do_sample: true,
+        // temperature: 0.7,
+    };
+
     /**
      * @param {string | string[] | import('../tokenization_utils.js').Message[] | import('../tokenization_utils.js').Message[][]} texts
      * @param {Partial<TextGenerationConfig>} generate_kwargs
@@ -154,6 +160,7 @@ export class TextGenerationPipeline
         const outputTokenIds = /** @type {Tensor} */ (
             await this.model.generate({
                 ...text_inputs,
+                ...this._default_generation_config,
                 ...generate_kwargs,
             })
         );
